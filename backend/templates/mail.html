@@ -12,111 +12,163 @@
     <title>Recursive Collapsible List</title>
     <style>
 
-    .item-box {
-        /* padding: 10px; */
-        /* border: 1px solid #ccc; */
-        /* margin: 5px 0; */
-        background-color: #f9f9f9;
-        display: flex;
-        flex-direction: column; /* Change to column layout */
-        /* max-width: 800px; */
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .title-text {
-        font-size: 18px;
-      /*  margin-bottom: 10px; /* Add spacing below title */ 
-    }
-
-    .button-group {
-        display: block; /* Change to block */
-        gap: 10px; /* Keep gap for spacing */
-    }
-
-    .collapse-button {
-        cursor: pointer;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 2px 5px;
-        font-size: 10px;
-        border-radius: 2px;
-        margin-top: 5px; /* Add margin above button */
-    }
-
-    .reply-button {
-        cursor: pointer;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 2px 5px;
-        font-size: 10px;
-        border-radius: 2px;
-        margin-top: 5px; /* Add margin above button */
-    }
-
-    .collapsible-content {
-        padding: 0 18px;
-        display: none;
-        overflow: hidden;
-        background-color: #f1f1f1;
-    }
-
-    .reply-box {
-        display: none; /* Hidden initially */
-        padding: 10px;
-        background-color: #f0f0f0;
-        border: 1px solid #ccc;
-        margin: 5px 0;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .reply-box textarea {
-        width: 100%;
-        height: 80px;
-        padding: 5px;
-        font-size: 14px;
-        margin-bottom: 10px; /* Add spacing below textarea */
-    }
-
-    .send-button {
-        cursor: pointer;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 5px 15px;
-        font-size: 14px;
-        border-radius: 5px;
-        margin-top: 10px; /* Add margin above button */
-    }
-
-    .instructions {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 5px;
-    }
-
-    ul {
-        list-style-type: none;
-        padding-left: 0;
-    }
-
-    ul ul {
-        margin-left: -15px; 
-    }
-
-    /* New styles for list items */
-    li {
-        border: 1px solid #ccc; /* Border around list items */
-        padding: 10px; /* Padding inside the list item */
-        margin: 5px 0; /* Spacing between list items */
-        background-color: #f9f9f9; /* Background color for list items */
-        border-radius: 5px; /* Rounded corners for list items */
-    }
-</style>
+        .item-box {
+            /* padding: 10px; */
+            /* border: 1px solid #ccc; */
+            /* margin: 5px 0; */
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column; /* Change to column layout */
+            /* max-width: 800px; */
+            margin-left: auto;
+            margin-right: auto;
+        }
+    
+        .title-text {
+            font-size: 18px;
+          /*  margin-bottom: 10px; /* Add spacing below title */ 
+        }
+    
+        .button-group {
+            display: block; /* Change to block */
+            gap: 10px; /* Keep gap for spacing */
+        }
+    
+        .collapse-button {
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 2px 5px;
+            font-size: 10px;
+            border-radius: 2px;
+            margin-top: 5px; /* Add margin above button */
+        }
+    
+        .reply-button {
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 2px 5px;
+            font-size: 10px;
+            border-radius: 2px;
+            margin-top: 5px; /* Add margin above button */
+        }
+    
+        .edit-button {
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 2px 5px;
+            font-size: 10px;
+            border-radius: 2px;
+            margin-top: 5px; /* Add margin above button */
+        }
+    
+        .collapsible-content {
+            padding: 0 18px;
+            display: none;
+            overflow: hidden;
+            background-color: #f1f1f1;
+        }
+    
+        .reply-box {
+            display: none; /* Hidden initially */
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            margin: 5px 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    
+        .pic-button {
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 2px 5px;
+            font-size: 10px;
+            border-radius: 2px;
+            margin-top: 5px; /* Add margin above button */
+        }
+    
+        .pic-box {
+            display: none; /* Hidden initially */
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            margin: 5px 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    
+        .edit-box {
+            display: none; /* Hidden initially */
+            padding: 10px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            margin: 5px 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    
+        .edit-box textarea {
+            width: 100%;
+            height: 80px;
+            padding: 5px;
+            font-size: 14px;
+            margin-bottom: 10px; /* Add spacing below textarea */
+        }
+    
+        .reply-box textarea {
+            width: 100%;
+            height: 80px;
+            padding: 5px;
+            font-size: 14px;
+            margin-bottom: 10px; /* Add spacing below textarea */
+        }
+    
+        .send-button {
+            cursor: pointer;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+            margin-top: 10px; /* Add margin above button */
+        }
+    
+        .instructions {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+    
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+    
+        ul ul {
+            margin-left: -15px; 
+        }
+    
+        /* New styles for list items */
+        li {
+            border: 1px solid #ccc; /* Border around list items */
+            padding: 10px; /* Padding inside the list item */
+            margin: 5px 0; /* Spacing between list items */
+            background-color: #f9f9f9; /* Background color for list items */
+            border-radius: 5px; /* Rounded corners for list items */
+        }
+    </style>
 
 </head>
 <body>
@@ -132,6 +184,15 @@
     var current_root = window.location.pathname.split('/')[2];
    
     init();
+    function autoSubmitForm(formID) {
+        //document.getElementById(formID).submit();
+        var form = document.getElementById(formID)
+        if (form) {
+            // Trigger the HTMX post
+            htmx.trigger(form, 'submit');
+        }
+    }
+
     function init(){
         console.log("initialize");
         console.log("root:",current_root);
@@ -169,6 +230,29 @@
         });
     });
 
+    // JavaScript to handle edit button actions
+    document.querySelectorAll('.edit-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const editBoxId = this.getAttribute('data-edit-target');
+            const editBox = document.getElementById(editBoxId);
+            if (editBox.style.display === 'block') {
+                editBox.style.display = 'none';
+            } else {
+                editBox.style.display = 'block';
+            }
+        });
+    });
+
+
+    // JavaScript to handle pic button actions
+    document.querySelectorAll('.pic-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const picBoxId = this.getAttribute('data-pic-target');
+            const picBox = document.getElementById(picBoxId);
+            picBox.myfiles.click();
+        });
+    });
+
     // Handle sending (example)
     document.querySelectorAll('.send-button').forEach(button => {
         button.addEventListener('click', function(ccomment) {
@@ -177,6 +261,7 @@
     });
 
     }
+
     document.addEventListener('htmx:afterSettle',function(evt){
 
         init();  
@@ -214,12 +299,39 @@
             {{ $itemId = (printf "item-%s" .Id) }} <!-- Unique ID for each item -->
             {{ $replyBoxId = (printf "reply-box-%s" .Id) }} <!-- Unique ID for each reply box -->
             {{ $collapseContentId = (printf "collapse-content-%s" .Id) }} <!-- Unique ID for each collapsible content -->
+            {{ $picBoxId := (printf "pic-box-%s" .Id) }} <!-- Unique ID for each reply box -->
         
             <div class="item-box">
-                <span class="title-text">{{.Message}}</span>
+                <div class="comment">
+                    <span class="title-text">{{.Message}}</span>
+                    <br>
+                    {{if .Picture}}
+                        <img src="{{(printf "/downloads/%s" .Picture)}}"  width="800" height="auto">
+                    {{end}}
+                </div>
+                {{if.Editable}}
+                <div class="button-group">
+                    <button class="pic-button" data-pic-target="{{ $picBoxId }}">Pic</button>
+                </div>
+
+                <div class="pic-box">
+                <!--    <form class="form-horizontal" id="{{ $picBoxId }}" method="post" action="/upload" enctype="multipart/form-data" name = "filesForm" > -->
+                <form class="form-horizontal" id="{{ $picBoxId }}" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#comment-list" hx-post="/upload" >    
+                    <div class="input-group">
+                        <input type = "hidden" name = "root" class="root_input" value = "" />
+                        <input type = "hidden" name = "id" value ="{{.Id}}" />
+                        <input type = "hidden" name = "source" value = "mail" />
+                        <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitForm('{{ $picBoxId }}')"> 
+                        <button type="submit" style="display: none;">Upload</button>
+                       <!-- <button id="myfiles" type="file">Upload</button> -->
+                    </div>
+                </form>
+                </div>                   
+            {{end}}
 
             </div>
             <!-- Reply box that will show/hide when reply button is clicked -->
+
         </li>
     {{end}} 
     <div class="button-group">

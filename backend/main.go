@@ -23,7 +23,7 @@ type Comment struct {
 	Picture  string
 	Root     bool
 	Sticky   bool
-	Editable bool
+	Editable bool // not saved in database
 	Created  time.Time
 	Sublist  []Comment
 }
@@ -84,19 +84,55 @@ func initDB() {
 
 func loadTestComments(db *sql.DB) {
 
-	insertComment(db, "id-1", "test", "test message 1", "root1", true, false)
+	insertComment(db, "id-1", "test", "test message 1", "root", true, false)
 	insertComment(db, "id-2", "test", "test message 2", "id-1", false, false)
 	insertComment(db, "id-3", "test", "test message 3", "id-1", false, false)
 	insertComment(db, "id-4", "test2", "test message 4", "id-3", false, false)
-	insertComment(db, "id-5", "test", "test message 5", "root2", true, false)
+	insertComment(db, "id-5", "test2", "test message 5", "root", true, false)
 	insertComment(db, "id-6", "test", "test message 6", "id-5", false, false)
 	insertComment(db, "id-7", "test2", "test message 7", "id-5", false, false)
+	insertComment(db, "id-8", "test", "test mail message 1", "test2", true, false)
+	insertComment(db, "id-9", "test2", "test mail message 2", "test", true, false)
 
 	//test child comment logic.
 	getChildComments(db, "id-1", "test")
 }
 
-func getmailComments(db *sql.DB, parentID string, username string) *[]Comment {
+func getRootComments(db *sql.DB, username string) *[]Comment {
+	var comments []Comment
+
+	var id string
+	var user string
+	var message string
+	var picture string
+	var parent string
+	var root bool
+	var sticky bool
+	var editable bool
+	var created time.Time
+	//rows, err := db.Query("SELECT * FROM comment where parent = 'root' ")
+	rows, err := db.Query(`SELECT id, user, message, picture, parent, root, sticky, created_at
+    					   FROM comment
+    					   WHERE root = 1 and parent = 'root'
+						   ORDER BY created_at;`)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	log.Println("root comments:")
+	for rows.Next() {
+		rows.Scan(&id, &user, &message, &picture, &parent, &root, &sticky, &created)
+		log.Println("Comment ID:", id, " Message:", message, "Parent", parent)
+		editable = (username == user)
+		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+	}
+
+	return &comments
+
+}
+
+func getMailComments(db *sql.DB, parentID string, username string) *[]Comment {
 	var comments []Comment
 
 	var id string
@@ -455,6 +491,10 @@ func mailAddHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.Header.Get("X-User")
 	message := r.FormValue("comment")
 	parent := r.FormValue("parent")
+
+	if username == "" {
+		username = "test"
+	}
 	//root := r.FormValue("root") // make boolean?
 	//sticky := r.FormValue("sticky") // make boolean?
 
@@ -471,7 +511,7 @@ func mailAddHandler(w http.ResponseWriter, r *http.Request) {
 	*/
 
 	log.Println("printing comments from:", r.FormValue("root"))
-	currentComments := getmailComments(database, r.FormValue("root"), username)
+	currentComments := getMailComments(database, r.FormValue("root"), username)
 	log.Println("message:", r.FormValue("comment"))
 
 	PrintComments(currentComments, "")
@@ -491,7 +531,7 @@ func mailHandler(w http.ResponseWriter, r *http.Request) {
 	//currentComments := getChildComments(database, parent)
 
 	//test child comment logic.
-	currentComments := getmailComments(database, parent, username)
+	currentComments := getMailComments(database, parent, username)
 
 	tmpl := template.Must(template.ParseFiles("templates/mail.html"))
 	tmpl.Execute(w, currentComments)
@@ -504,6 +544,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	id := ""
 	root := ""
 	filename := ""
+	source := ""
 
 	// Ensure the request is a POST
 	if r.Method != http.MethodPost {
@@ -578,6 +619,16 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 				log.Println("root field value:", string(data))
 				root = string(data)
 			}
+			if part.FormName() == "source" {
+				data, err := io.ReadAll(part)
+				if err != nil {
+					log.Println("error reading hidden field:", err.Error())
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				log.Println("source field value:", string(data))
+				source = string(data)
+			}
 		}
 	}
 
@@ -589,11 +640,137 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("uploading file from:", username, " adding to comment id:", id, " root Id:", root)
 	editCommentPic(database, id, filename)
-	currentComments := getChildComments(database, root, username)
 
-	PrintComments(currentComments, "")
-	tpl = template.Must(template.ParseFiles("templates/collapse.html"))
-	tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	if source == "comment" {
+		currentComments := getChildComments(database, root, username)
+
+		PrintComments(currentComments, "")
+		tpl = template.Must(template.ParseFiles("templates/collapse.html"))
+		tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	}
+	if source == "mail" {
+		currentComments := getMailComments(database, root, username)
+
+		tmpl := template.Must(template.ParseFiles("templates/mail.html"))
+		tmpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+
+	}
+	if source == "index" {
+
+		currentComments := getRootComments(database, username)
+		tmpl := template.Must(template.ParseFiles("templates/index.html"))
+		tmpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+
+	}
+}
+
+func indexAddHandler(w http.ResponseWriter, r *http.Request) {
+
+	var bRoot bool
+	var bSticky bool
+
+	id := uuid.New().String()
+	username := r.Header.Get("X-User")
+	message := r.FormValue("comment")
+	parent := "root"
+	bRoot = true
+
+	if username == "" {
+		username = "test"
+	}
+
+	//parent := r.FormValue("parent")
+	//root := r.FormValue("root") // make boolean?
+	//sticky := r.FormValue("sticky") // make boolean?
+
+	//parent = parent[10:] // strip javascript identifier
+	//comment := Comment{Id: id, User: username, Message: message, Root: bRoot, Sticky: bSticky, Sublist: nil}
+
+	//fmt.Printf("parent: %s\n", parent)
+	//fmt.Printf("comment:%v\n", comment)
+
+	insertComment(database, id, username, message, parent, bRoot, bSticky)
+	/*
+			AddCommentToSublist(&comments, parent, comment)
+			log.Println("added to sublist")
+
+
+		log.Println("printing comments from:", r.FormValue("root"))
+		currentComments := getMailComments(database, r.FormValue("root"), username)
+		log.Println("message:", r.FormValue("comment"))
+
+		PrintComments(currentComments, "")
+
+		tpl = template.Must(template.ParseFiles("templates/mail.html"))
+
+		tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	*/
+
+	log.Println("In index, user:", username)
+	currentComments := getRootComments(database, username)
+
+	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	tmpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+}
+
+func indexEditHandler(w http.ResponseWriter, r *http.Request) {
+
+	var bRoot bool
+	var bSticky bool
+
+	username := r.Header.Get("X-User")
+	message := r.FormValue("comment")
+	parent := r.FormValue("parent")
+	id := r.FormValue("id")
+
+	if username == "" {
+		username = "test"
+	}
+	//root := r.FormValue("root") // make boolean?
+	//sticky := r.FormValue("sticky") // make boolean?
+
+	parent = parent[10:] // strip javascript identifier
+	//comment := Comment{Id: id, User: username, Message: message, Root: bRoot, Sticky: bSticky, Sublist: nil}
+
+	fmt.Printf("parent: %s\n", parent)
+	//fmt.Printf("comment:%v\n", comment)
+
+	editComment(database, id, message, parent, bRoot, bSticky)
+	/*
+			AddCommentToSublist(&comments, parent, comment)
+			log.Println("added to sublist")
+
+
+		log.Println("printing comments from:", r.FormValue("root"))
+		currentComments := getChildComments(database, r.FormValue("root"), username)
+
+		PrintComments(currentComments, "")
+
+		tpl = template.Must(template.ParseFiles("templates/collapse.html"))
+
+		tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	*/
+
+	log.Println("In index, user:", username)
+	currentComments := getRootComments(database, username)
+
+	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	tmpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+}
+
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+
+	username := r.Header.Get("X-User")
+	if username == "" {
+		username = "test"
+	}
+
+	log.Println("In index, user:", username)
+	currentComments := getRootComments(database, username)
+
+	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	tmpl.Execute(w, currentComments)
+
 }
 
 func main() {
@@ -605,18 +782,22 @@ func main() {
 	}
 
 	// Serve files from the "./downloads" directory
+	/*
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			username := r.Header.Get("X-User")
 
-		username := r.Header.Get("X-User")
-
-		fmt.Fprintf(w, "<h1>pecularity ver: 0.1\n User: %s</h1>", username)
-	})
+			fmt.Fprintf(w, "<h1>pecularity ver: 0.1\n User: %s</h1>", username)
+		})
+	*/
 
 	http.Handle("/downloads/", http.StripPrefix("/downloads/", http.FileServer(http.Dir("./downloads"))))
 
+	http.HandleFunc("/", indexHandler)
+	http.HandleFunc("/indexAddComment", indexAddHandler)
+	http.HandleFunc("/indexEditComment", indexEditHandler)
+
 	http.HandleFunc("/healthcheck", healthCheck)
-	//http.HandleFunc("/collapse", handler)
 	http.HandleFunc("/collapseadd", addHandler)
 	http.HandleFunc("/collapseedit", editHandler)
 	http.HandleFunc("/comment/{id}/", commentHandler)
