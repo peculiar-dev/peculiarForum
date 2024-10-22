@@ -4,11 +4,17 @@
     integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" 
     crossorigin="anonymous">
 </script>
+<script>
+    document.addEventListener('htmx:afterSettle',function(evt){
+        init(); 
+    });
+</script>
 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/index.css">
     <title>Index</title>
     <h2>Main Page</h2>
     <button class="post-button" >Post</button>
@@ -20,325 +26,15 @@
                     <input value="Submit" type="submit" onclick='current_comment = "post-box";'> 
                 </form>
             </div>
-    <style>
-
-    .item-box {
-        /* padding: 10px; */
-        /* border: 1px solid #ccc; */
-        /* margin: 5px 0; */
-        background-color: #f9f9f9;
-        display: flex;
-        flex-direction: column; /* Change to column layout */
-        /* max-width: 800px; */
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .title-text {
-        font-size: 18px;
-      /*  margin-bottom: 10px; /* Add spacing below title */ 
-    }
-
-    .button-group {
-        display: block; /* Change to block */
-        gap: 10px; /* Keep gap for spacing */
-    }
-
-    .collapse-button {
-        cursor: pointer;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 2px 5px;
-        font-size: 10px;
-        border-radius: 2px;
-        margin-top: 5px; /* Add margin above button */
-    }
-
-    .reply-button {
-        cursor: pointer;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 2px 5px;
-        font-size: 10px;
-        border-radius: 2px;
-        margin-top: 5px; /* Add margin above button */
-    }
-
-    .edit-button {
-        cursor: pointer;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 2px 5px;
-        font-size: 10px;
-        border-radius: 2px;
-        margin-top: 5px; /* Add margin above button */
-    }
-
-    .collapsible-content {
-        padding: 0 18px;
-        display: none;
-        overflow: hidden;
-        background-color: #f1f1f1;
-    }
-
-    .reply-box {
-        display: none; /* Hidden initially */
-        padding: 10px;
-        background-color: #f0f0f0;
-        border: 1px solid #ccc;
-        margin: 5px 0;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .pic-button {
-        cursor: pointer;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 2px 5px;
-        font-size: 10px;
-        border-radius: 2px;
-        margin-top: 5px; /* Add margin above button */
-    }
-
-    .pic-box {
-        display: none; /* Hidden initially */
-        padding: 10px;
-        background-color: #f0f0f0;
-        border: 1px solid #ccc;
-        margin: 5px 0;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .edit-box {
-        display: none; /* Hidden initially */
-        padding: 10px;
-        background-color: #f0f0f0;
-        border: 1px solid #ccc;
-        margin: 5px 0;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .post-box {
-        display: none; /* Hidden initially */
-        padding: 10px;
-        background-color: #f0f0f0;
-        border: 1px solid #ccc;
-        margin: 5px 0;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    .post-box textarea {
-        width: 100%;
-        height: 80px;
-        padding: 5px;
-        font-size: 14px;
-        margin-bottom: 10px; /* Add spacing below textarea */
-    }
-
-    .edit-box textarea {
-        width: 100%;
-        height: 80px;
-        padding: 5px;
-        font-size: 14px;
-        margin-bottom: 10px; /* Add spacing below textarea */
-    }
-
-    .reply-box textarea {
-        width: 100%;
-        height: 80px;
-        padding: 5px;
-        font-size: 14px;
-        margin-bottom: 10px; /* Add spacing below textarea */
-    }
-
-    .post-button {
-        cursor: pointer;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 5px 15px;
-        font-size: 14px;
-        border-radius: 5px;
-        margin-top: 10px; /* Add margin above button */
-    }
-
-    .send-button {
-        cursor: pointer;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        padding: 5px 15px;
-        font-size: 14px;
-        border-radius: 5px;
-        margin-top: 10px; /* Add margin above button */
-    }
-
-    .instructions {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 5px;
-    }
-
-    ul {
-        list-style-type: none;
-        padding-left: 0;
-    }
-
-    ul ul {
-        margin-left: -15px; 
-    }
-
-    /* New styles for list items */
-    li {
-        border: 1px solid #ccc; /* Border around list items */
-        padding: 10px; /* Padding inside the list item */
-        margin: 5px 0; /* Spacing between list items */
-        background-color: #f9f9f9; /* Background color for list items */
-        border-radius: 5px; /* Rounded corners for list items */
-    }
-</style>
 
 </head>
 <body>
-
-
-
-
 
 <!-- Recursive template rendering for lists with sub-lists -->
 {{block "comment-list-element" .}} 
 {{template "list" .}} 
 {{end}}
-<script>
-    var current_comment = "";
-    var current_root = window.location.pathname.split('/')[2];
-   
-    init();
-    function autoSubmitForm(formID) {
-        //document.getElementById(formID).submit();
-        var form = document.getElementById(formID)
-        if (form) {
-            // Trigger the HTMX post
-            htmx.trigger(form, 'submit');
-        }
-    }
-
-    function init(){
-        console.log("initialize");
-        console.log("root:",current_root);
-        //document.getElementById("form_root").value = current_root;
-        var elements = document.getElementsByName("root");
-        for(var i = 0; i < elements.length; i++) {
-            console.log("found");
-            elements[i].value = current_root;
-        }
-    // JavaScript to handle collapsible actions
-    document.querySelectorAll('.collapse-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const targetId = this.getAttribute('data-target');
-            const content = document.getElementById(targetId);
-            if (content.style.display === 'block') {
-                content.style.display = 'none';
-                this.innerHTML = '+';
-            } else {
-                content.style.display = 'block';
-                this.innerHTML = '-';
-            }
-        });
-    });
-
-    // JavaScript to handle reply button actions
-    document.querySelectorAll('.post-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const postBox = document.getElementById("post-box");
-            if (postBox.style.display === 'block') {
-                postBox.style.display = 'none';
-            } else {
-                postBox.style.display = 'block';
-            }
-        });
-    });
-
-    // JavaScript to handle reply button actions
-    document.querySelectorAll('.reply-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const replyBoxId = this.getAttribute('data-reply-target');
-            const replyBox = document.getElementById(replyBoxId);
-            if (replyBox.style.display === 'block') {
-                replyBox.style.display = 'none';
-            } else {
-                replyBox.style.display = 'block';
-            }
-        });
-    });
-
-    // JavaScript to handle edit button actions
-    document.querySelectorAll('.edit-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const editBoxId = this.getAttribute('data-edit-target');
-            const editBox = document.getElementById(editBoxId);
-            if (editBox.style.display === 'block') {
-                editBox.style.display = 'none';
-            } else {
-                editBox.style.display = 'block';
-            }
-        });
-    });
-
-
-    // JavaScript to handle pic button actions
-    document.querySelectorAll('.pic-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const picBoxId = this.getAttribute('data-pic-target');
-            const picBox = document.getElementById(picBoxId);
-            picBox.myfiles.click();
-        });
-    });
-
-    // Handle sending (example)
-    document.querySelectorAll('.send-button').forEach(button => {
-        button.addEventListener('click', function(ccomment) {
-            current_comment = ccomment;
-        });
-    });
-
-    }
-
-    document.addEventListener('htmx:afterSettle',function(evt){
-
-        init();  
-        recent = document.getElementById(current_comment).parentElement.children[1]
-        //document.getElementById(current_comment).parentElement.nextElementSibling
-        console.log(recent.className)
-        console.log(recent.tagName)
-        if (recent){
-            currentItem = recent;
-            while (currentItem && currentItem.tagName !== 'BODY'){
-                if (currentItem.className==="collapsible-content"){
-                    currentItem.style.display = 'block';
-                    console.log(currentItem.id)
-                    console.log(currentItem.style.display)
-                }
-
-                currentItem = currentItem.parentElement;
-            }
-
-        }
-    });
-</script>
-
+<script src="/static/index.js"></script>
 </body>
 </html>
 
@@ -399,7 +95,7 @@
             <!-- Edit box that will show/hide when edit button is clicked -->
             <div id="{{ $editBoxId }}" class="edit-box">
                 <div class="instructions">Enter new text below:</div>
-                <form hx-swap="innerHTML" hx-target="#comment-list" hx-post="/collapseedit"> 
+                <form hx-swap="innerHTML" hx-target="#comment-list" hx-post="/indexEditComment"> 
                      <input type = "hidden" name = "parent" value = "{{ $replyBoxId }}" />
                      <input type = "hidden" name = "root" class="root_input" value = "" />
                     <input type = "hidden" name = "id" value ="{{.Id}}" />

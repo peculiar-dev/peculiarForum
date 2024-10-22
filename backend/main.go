@@ -815,6 +815,7 @@ func main() {
 	*/
 
 	http.Handle("/downloads/", http.StripPrefix("/downloads/", http.FileServer(http.Dir("./downloads"))))
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/indexAddComment", indexAddHandler)
