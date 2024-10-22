@@ -638,8 +638,31 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		username = "test"
 	}
 
+	dirPath := "./downloads/" + username
+
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		// Create the directory with 0755 permissions
+		err := os.MkdirAll(dirPath, 0755)
+		if err != nil {
+			//panic(err)
+			fmt.Println("Error creating file directory:", err)
+		}
+		println("Directory created successfully.")
+	} else if err != nil {
+		panic(err)
+	} else {
+		println("Directory already exists.")
+	}
+
+	err = os.Rename("./downloads/"+filename, "./downloads/"+username+"/"+filename)
+	if err != nil {
+		fmt.Println("Error moving file:", err)
+	} else {
+		fmt.Println("File moved successfully.")
+	}
+
 	log.Println("uploading file from:", username, " adding to comment id:", id, " root Id:", root)
-	editCommentPic(database, id, filename)
+	editCommentPic(database, id, username+"/"+filename)
 
 	if source == "comment" {
 		currentComments := getChildComments(database, root, username)
