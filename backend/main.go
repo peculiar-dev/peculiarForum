@@ -32,12 +32,6 @@ type IndexData struct {
 	Comments []Comment
 }
 
-type Item struct {
-	Title    string
-	Id       string
-	SubItems []Item
-}
-
 var stopProcess chan bool
 
 //var comments []Comment
@@ -312,22 +306,6 @@ func editCommentPic(db *sql.DB, id, picture string) {
 }
 
 // AddToSublist searches for an item by its name in a potentially nested structure
-func AddToSublist(items *[]Item, itemName, newItem string) bool {
-	for i, item := range *items {
-		if item.Title == itemName {
-			// If found, add newItem to the sublist
-			(*items)[i].SubItems = append((*items)[i].SubItems, Item{Title: newItem, Id: uuid.New().String(), SubItems: nil})
-			return true
-		}
-		// Recursive call to search in sublists
-		if AddToSublist(&item.SubItems, itemName, newItem) {
-			return true
-		}
-	}
-	return false
-}
-
-// AddToSublist searches for an item by its name in a potentially nested structure
 func AddCommentToSublist(comments *[]Comment, id string, newComment Comment) bool {
 	for i, comment := range *comments {
 		if comment.Id == id {
@@ -341,17 +319,6 @@ func AddCommentToSublist(comments *[]Comment, id string, newComment Comment) boo
 		}
 	}
 	return false
-}
-
-// Helper function to print items and their sublists
-func Print(items *[]Item, indent string) {
-	for _, item := range *items {
-		fmt.Println(indent+"Item:", item.Title)
-		if len(item.SubItems) > 0 {
-			Print(&item.SubItems, indent+"  ") // Increase indentation for sublists
-		}
-	}
-
 }
 
 // Helper function to print items and their sublists
@@ -461,6 +428,37 @@ func editHandler(w http.ResponseWriter, r *http.Request) {
 	tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
 }
 
+func indexEditHandler(w http.ResponseWriter, r *http.Request) {
+
+	var bRoot bool
+	var bSticky bool
+
+	username := r.Header.Get("X-User")
+	message := r.FormValue("comment")
+	parent := r.FormValue("parent")
+	id := r.FormValue("id")
+
+	if username == "" {
+		username = "test"
+	}
+	//root := r.FormValue("root") // make boolean?
+	//sticky := r.FormValue("sticky") // make boolean?
+
+	parent = parent[10:] // strip javascript identifier
+	//comment := Comment{Id: id, User: username, Message: message, Root: bRoot, Sticky: bSticky, Sublist: nil}
+
+	fmt.Printf("parent: %s\n", parent)
+	//fmt.Printf("comment:%v\n", comment)
+
+	editComment(database, id, message, parent, bRoot, bSticky)
+
+	log.Println("In index, user:", username)
+	currentComments := getRootComments(database, username)
+
+	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	tmpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+}
+
 func commentHandler(w http.ResponseWriter, r *http.Request) {
 
 	parent := r.PathValue("id")
@@ -525,6 +523,10 @@ func mailHandler(w http.ResponseWriter, r *http.Request) {
 
 	parent := r.PathValue("id")
 	username := r.Header.Get("X-User")
+
+	if username == "" {
+		username = "test"
+	}
 
 	log.Println("In mailHandler looking for Parent:", parent)
 
@@ -664,27 +666,22 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("uploading file from:", username, " adding to comment id:", id, " root Id:", root)
 	editCommentPic(database, id, username+"/"+filename)
 
-	if source == "comment" {
+	switch source {
+	case "comment":
 		currentComments := getChildComments(database, root, username)
-
 		PrintComments(currentComments, "")
 		tpl = template.Must(template.ParseFiles("templates/collapse.html"))
 		tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
-	}
-	if source == "mail" {
+	case "mail":
 		currentComments := getMailComments(database, root, username)
-
 		tmpl := template.Must(template.ParseFiles("templates/mail.html"))
 		tmpl.ExecuteTemplate(w, "comment-list-element", currentComments)
-
-	}
-	if source == "index" {
-
+	case "index":
 		currentComments := getRootComments(database, username)
 		tmpl := template.Must(template.ParseFiles("templates/index.html"))
 		tmpl.ExecuteTemplate(w, "comment-list-element", currentComments)
-
 	}
+
 }
 
 func indexAddHandler(w http.ResponseWriter, r *http.Request) {
@@ -702,77 +699,7 @@ func indexAddHandler(w http.ResponseWriter, r *http.Request) {
 		username = "test"
 	}
 
-	//parent := r.FormValue("parent")
-	//root := r.FormValue("root") // make boolean?
-	//sticky := r.FormValue("sticky") // make boolean?
-
-	//parent = parent[10:] // strip javascript identifier
-	//comment := Comment{Id: id, User: username, Message: message, Root: bRoot, Sticky: bSticky, Sublist: nil}
-
-	//fmt.Printf("parent: %s\n", parent)
-	//fmt.Printf("comment:%v\n", comment)
-
 	insertComment(database, id, username, message, parent, bRoot, bSticky)
-	/*
-			AddCommentToSublist(&comments, parent, comment)
-			log.Println("added to sublist")
-
-
-		log.Println("printing comments from:", r.FormValue("root"))
-		currentComments := getMailComments(database, r.FormValue("root"), username)
-		log.Println("message:", r.FormValue("comment"))
-
-		PrintComments(currentComments, "")
-
-		tpl = template.Must(template.ParseFiles("templates/mail.html"))
-
-		tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
-	*/
-
-	log.Println("In index, user:", username)
-	currentComments := getRootComments(database, username)
-
-	tmpl := template.Must(template.ParseFiles("templates/index.html"))
-	tmpl.ExecuteTemplate(w, "comment-list-element", currentComments)
-}
-
-func indexEditHandler(w http.ResponseWriter, r *http.Request) {
-
-	var bRoot bool
-	var bSticky bool
-
-	username := r.Header.Get("X-User")
-	message := r.FormValue("comment")
-	parent := r.FormValue("parent")
-	id := r.FormValue("id")
-
-	if username == "" {
-		username = "test"
-	}
-	//root := r.FormValue("root") // make boolean?
-	//sticky := r.FormValue("sticky") // make boolean?
-
-	parent = parent[10:] // strip javascript identifier
-	//comment := Comment{Id: id, User: username, Message: message, Root: bRoot, Sticky: bSticky, Sublist: nil}
-
-	fmt.Printf("parent: %s\n", parent)
-	//fmt.Printf("comment:%v\n", comment)
-
-	editComment(database, id, message, parent, bRoot, bSticky)
-	/*
-			AddCommentToSublist(&comments, parent, comment)
-			log.Println("added to sublist")
-
-
-		log.Println("printing comments from:", r.FormValue("root"))
-		currentComments := getChildComments(database, r.FormValue("root"), username)
-
-		PrintComments(currentComments, "")
-
-		tpl = template.Must(template.ParseFiles("templates/collapse.html"))
-
-		tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
-	*/
 
 	log.Println("In index, user:", username)
 	currentComments := getRootComments(database, username)
@@ -804,29 +731,22 @@ func main() {
 		Addr: port,
 	}
 
-	// Serve files from the "./downloads" directory
-	/*
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-
-			username := r.Header.Get("X-User")
-
-			fmt.Fprintf(w, "<h1>pecularity ver: 0.1\n User: %s</h1>", username)
-		})
-	*/
-
 	http.Handle("/downloads/", http.StripPrefix("/downloads/", http.FileServer(http.Dir("./downloads"))))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	http.HandleFunc("/healthcheck", healthCheck)
 
 	http.HandleFunc("/", indexHandler)
-	http.HandleFunc("/indexAddComment", indexAddHandler)
-	http.HandleFunc("/indexEditComment", indexEditHandler)
 
-	http.HandleFunc("/healthcheck", healthCheck)
+	http.HandleFunc("/indexAddComment", indexAddHandler)
 	http.HandleFunc("/collapseadd", addHandler)
+	http.HandleFunc("/mailadd", mailAddHandler)
+
+	http.HandleFunc("/indexEditComment", indexEditHandler)
 	http.HandleFunc("/collapseedit", editHandler)
+
 	http.HandleFunc("/comment/{id}/", commentHandler)
 	http.HandleFunc("/mail/{id}/", mailHandler)
-	http.HandleFunc("/mailadd", mailAddHandler)
+
 	http.HandleFunc("/upload", uploadHandler)
 
 	log.Println("Starting server on port: " + port)

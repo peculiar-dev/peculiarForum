@@ -20,7 +20,7 @@
 {{block "comment-list-element" .}} 
 {{template "list" .}} 
 {{end}}
-<script src="/static/index.js"></script>
+<script src="/static/mail.js"></script>
 </body>
 </html>
 
@@ -81,6 +81,7 @@
        <form hx-swap="innerHTML" hx-target="#comment-list" hx-post="/mailadd"> 
             <input type = "hidden" name = "parent" value = "{{ $replyBoxId }}" />
             <input type = "hidden" name = "root" class="root_input" value = "" />
+            <input type = "hidden" name = "source" value = "mail" />
            <!-- <input type="textarea" name="comment" id="comment" placeholder="Write your reply here..."> -->
             <textarea name="comment" id="comment" placeholder="Write your reply here..." rows="4" cols="50"></textarea>
             <input value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 

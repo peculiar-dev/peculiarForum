@@ -21,7 +21,17 @@
             elements[i].value = current_root;
         }
 
-
+        // JavaScript to handle post button actions
+        document.querySelectorAll('.post-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const postBox = document.getElementById("post-box");
+                if (postBox.style.display === 'block') {
+                    postBox.style.display = 'none';
+                } else {
+                    postBox.style.display = 'block';
+                }
+            });
+        });
 
     // JavaScript to handle collapsible actions
     document.querySelectorAll('.collapse-button').forEach(button => {
@@ -81,22 +91,10 @@
         });
     });
 
-    // make post box hidden on each HTMX refresh
-    const postBox = document.getElementById("post-box");
-    postBox.style.display = 'none';
-
     }
 
-        // JavaScript to handle post button actions
-        document.querySelectorAll('.post-button').forEach(button => {
-            console.log("initializing post button")
-            const postBox = document.getElementById("post-box");
-            postBox.style.display = 'none';
-            button.addEventListener('click', function() {
-                if (postBox.style.display === 'block') {
-                    postBox.style.display = 'none';
-                } else {
-                    postBox.style.display = 'block';
-                }
-            });
-        });
+    document.addEventListener('htmx:afterSettle',function(evt){
+
+        init();  
+  
+    });
