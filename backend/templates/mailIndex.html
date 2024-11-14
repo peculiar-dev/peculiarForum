@@ -36,7 +36,7 @@
 {{block "comment-list-element" .}} 
 {{template "list" .}} 
 {{end}}
-<script src="/static/index.js"></script>
+<script src="/static/mailIndex.js"></script>
 </body>
 </html>
 <!-- Recursive List Template Definition -->
@@ -70,7 +70,7 @@
 
                     <!-- Reply button for all items -->
                     <!-- <button class="reply-button" data-reply-target="{{ $replyBoxId }}">Comments</button> -->
-                    <a href="{{(printf "/comment/%s" .Id)}}" >comments</a> 
+                    <a href="{{(printf "/mail/%s" .Id)}}" >comments</a> 
 
                     {{if .Editable}}
                         <!-- Edit button for all items -->
@@ -79,11 +79,11 @@
 
                         <div class="pic-box">
                         <!--    <form class="form-horizontal" id="{{ $picBoxId }}" method="post" action="/upload" enctype="multipart/form-data" name = "filesForm" > -->
-                        <form class="form-horizontal" id="{{ $picBoxId }}" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#comment-list" hx-post="/indexUpload" >    
+                        <form class="form-horizontal" id="{{ $picBoxId }}" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#comment-list" hx-post="/mailUpload" >    
                             <div class="input-group">
                                 <input type = "hidden" name = "root" class="root_input" value = "" />
                                 <input type = "hidden" name = "id" value ="{{.Id}}" />
-                                <!--  <input type = "hidden" name = "source" value = "index" /> -->
+                               <!-- <input type = "hidden" name = "source" value = "index" /> -->
                                 <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitForm('{{ $picBoxId }}')"> 
                                 <button type="submit" style="display: none;">Upload</button>
                                <!-- <button id="myfiles" type="file">Upload</button> -->

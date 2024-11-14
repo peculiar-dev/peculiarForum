@@ -1,4 +1,4 @@
-module pecularity
+module peculiarity
 
 go 1.22
 

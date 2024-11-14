@@ -66,11 +66,11 @@
 
                         <div class="pic-box">
                         <!--    <form class="form-horizontal" id="{{ $picBoxId }}" method="post" action="/upload" enctype="multipart/form-data" name = "filesForm" > -->
-                        <form class="form-horizontal" id="{{ $picBoxId }}" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#comment-list" hx-post="/upload" >    
+                        <form class="form-horizontal" id="{{ $picBoxId }}" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#comment-list" hx-post="/commentUpload" >    
                             <div class="input-group">
                                 <input type = "hidden" name = "root" class="root_input" value = "" />
                                 <input type = "hidden" name = "id" value ="{{.Id}}" />
-                                <input type = "hidden" name = "source" value = "comment" />
+                                <!-- <input type = "hidden" name = "source" value = "comment" /> -->
                                 <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitForm('{{ $picBoxId }}')"> 
                                 <button type="submit" style="display: none;">Upload</button>
                                <!-- <button id="myfiles" type="file">Upload</button> -->
