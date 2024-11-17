@@ -7,16 +7,16 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"peculiarity/internal/commentdb"
+	"peculiarity/internal/data"
 
 	"github.com/google/uuid"
 )
 
 type IndexHandler struct {
-	comments commentdb.Commentdb
+	comments data.Commentdb
 }
 
-func NewIndexHandler(commentdb commentdb.Commentdb) *IndexHandler {
+func NewIndexHandler(commentdb data.Commentdb) *IndexHandler {
 	return &IndexHandler{comments: commentdb}
 }
 

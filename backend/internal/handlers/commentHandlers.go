@@ -7,16 +7,16 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"peculiarity/internal/commentdb"
+	"peculiarity/internal/data"
 
 	"github.com/google/uuid"
 )
 
 type CommentHandler struct {
-	comments commentdb.Commentdb
+	comments data.Commentdb
 }
 
-func NewCommentHandler(commentdb commentdb.Commentdb) *CommentHandler {
+func NewCommentHandler(commentdb data.Commentdb) *CommentHandler {
 	return &CommentHandler{comments: commentdb}
 }
 

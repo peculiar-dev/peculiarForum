@@ -1,4 +1,4 @@
-package commentdb
+package data
 
 import (
 	"database/sql"
@@ -25,6 +25,10 @@ type Comment struct {
 
 type SqliteCommentDB struct {
 	database *sql.DB
+}
+
+func (db *SqliteCommentDB) Setdb(newdb *sql.DB) {
+	db.database = newdb
 }
 
 func (db *SqliteCommentDB) Getdb() *sql.DB {

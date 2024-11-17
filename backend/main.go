@@ -2,13 +2,12 @@ package main
 
 import (
 	"context"
-	"peculiarity/internal/commentdb"
+	"peculiarity/internal/data"
 	"peculiarity/internal/handlers"
 
 	"fmt"
 	"log"
 	"net/http"
-	"text/template"
 	"time"
 
 	"github.com/google/uuid"
@@ -30,14 +29,17 @@ type IndexData struct {
 	Comments []Comment
 }
 
-var commentsdb *commentdb.SqliteCommentDB
+var commentsdb data.Commentdb
+var userdb data.Userdb
+
 var stopProcess chan bool
 
 //var comments []Comment
 
 var running bool = true
 var port string
-var tpl *template.Template
+
+//var tpl *template.Template
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {
 	if running {
@@ -50,9 +52,16 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 func init() {
 
 	port = ":8080"
-	tpl = template.Must(template.ParseGlob("templates/*"))
-	commentsdb = commentdb.NewSqliteCommentDB()
+	//tpl = template.Must(template.ParseGlob("templates/*"))
+
+	commentsdb = data.NewSqliteCommentDB()
 	commentsdb.InitDB()
+	userdb = data.NewSqliteUserDB()
+	userdb.Setdb(commentsdb.Getdb()) // set the userdb to the same sqlite db instance
+	userdb.CreateUserTable()
+	userdb.LoadTestComments()
+	log.Default().Println(userdb.GetUsers())
+
 	uuidWithHyphen := uuid.New()
 	fmt.Println(uuidWithHyphen)
 
