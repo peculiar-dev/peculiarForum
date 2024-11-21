@@ -31,6 +31,7 @@ type IndexData struct {
 
 var commentsdb data.Commentdb
 var userdb data.Userdb
+var notificationdb data.Notificationdb
 
 var stopProcess chan bool
 
@@ -56,11 +57,18 @@ func init() {
 
 	commentsdb = data.NewSqliteCommentDB()
 	commentsdb.InitDB()
+
 	userdb = data.NewSqliteUserDB()
 	userdb.Setdb(commentsdb.Getdb()) // set the userdb to the same sqlite db instance
 	userdb.CreateUserTable()
-	userdb.LoadTestComments()
+	userdb.LoadTestUsers()
 	log.Default().Println(userdb.GetUsers())
+
+	notificationdb = data.NewSqliteNotificationDB()
+	notificationdb.Setdb(commentsdb.Getdb()) // set the notification db to the same sqline db instance
+	notificationdb.CreateNotificationTable()
+	notificationdb.LoadTestNotifications()
+	log.Default().Println(notificationdb.GetNotifications("test"))
 
 	uuidWithHyphen := uuid.New()
 	fmt.Println(uuidWithHyphen)
@@ -108,6 +116,7 @@ func main() {
 	log.Println("Starting server on port: " + port)
 
 	defer commentsdb.Getdb().Close()
+	defer userdb.Getdb().Close()
 
 	go func() {
 		if err := http.ListenAndServe(port, nil); err != nil && err != http.ErrServerClosed {

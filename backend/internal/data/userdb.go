@@ -10,7 +10,7 @@ type Userdb interface {
 	Setdb(*sql.DB)
 	InitDB()
 	CreateUserTable()
-	LoadTestComments()
+	LoadTestUsers()
 	InsertUser(user User)
 	GetUsers() *[]User
 }

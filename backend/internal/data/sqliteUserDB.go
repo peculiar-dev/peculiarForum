@@ -55,9 +55,7 @@ func (db *SqliteUserDB) InitDB() {
 
 func (db *SqliteUserDB) CreateUserTable() {
 	/*
-		This struct will be a row on a table. The sublist relationship
-		will be maintained by loading all comments with the parent
-		of the current comment.
+		This struct will be a row on a table.
 
 		Username  string    // Username of this user
 		Created   time.Time // Creation timestamp
@@ -84,8 +82,8 @@ func (db *SqliteUserDB) InsertUser(user User) {
 	currentTime := time.Now()
 
 	log.Println("Inserting user record ...")
-	insertCommentSQL := `INSERT INTO user(username, created_at, lastlogin_at) VALUES (?, ?, ?)`
-	statement, err := db.database.Prepare(insertCommentSQL) // Prepare statement.
+	insertUserSQL := `INSERT INTO user(username, created_at, lastlogin_at) VALUES (?, ?, ?)`
+	statement, err := db.database.Prepare(insertUserSQL) // Prepare statement.
 	// This is good to avoid SQL injections
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -96,7 +94,7 @@ func (db *SqliteUserDB) InsertUser(user User) {
 	}
 }
 
-func (db *SqliteUserDB) LoadTestComments() {
+func (db *SqliteUserDB) LoadTestUsers() {
 
 	db.InsertUser(User{Username: "test", Created: time.Now(), LastLogin: time.Now()})
 	db.InsertUser(User{Username: "test2", Created: time.Now(), LastLogin: time.Now()})
@@ -117,9 +115,9 @@ func (db *SqliteUserDB) GetUsers() *[]User {
 		log.Fatal(err)
 	}
 	defer rows.Close()
-	log.Println("root comments:")
+	log.Println("get Users:")
 	for rows.Next() {
-		rows.Scan(&username, &created, lastLogin)
+		rows.Scan(&username, &created, &lastLogin)
 		log.Println("Username: ", username)
 
 		users = append(users, User{Username: username, Created: created, LastLogin: lastLogin})

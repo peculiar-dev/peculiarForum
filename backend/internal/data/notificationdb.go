@@ -9,4 +9,8 @@ type Notificationdb interface {
 	Getdb() *sql.DB
 	Setdb(*sql.DB)
 	InitDB()
+	CreateNotificationTable()
+	InsertNotification(notification Notification)
+	LoadTestNotifications()
+	GetNotifications(username string) *[]Notification
 }
