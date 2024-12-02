@@ -18,12 +18,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/index.css">
     <title>Index</title>
-    <h2>Main Page</h2>
+
+    {{ template "header" . }}
+
     <button class="post-button" >Post</button>
             <!-- Reply box that will show/hide when reply button is clicked -->
             <div id="post-box" class="post-box">
                 <div class="instructions">Enter your post below:</div>
-                <form hx-swap="innerHTML" hx-target="#comment-list" hx-post="/indexAddComment"> 
+                <form hx-swap="innerHTML" hx-target="#comment-list" hx-post="/indexAddHandler"> 
+                    <label for="user">Choose a User to Direct Message:</label>
+                    <select id="user" name="user">
+                        {{range .Users}}
+                        <option value="{{.Username}}">{{.Username}}</option>
+                        {{end}}
+                    </select>
                     <textarea name="comment" id="comment" placeholder="Write your comment here..." rows="4" cols="50"></textarea>
                     <input value="Submit" type="submit" onclick='current_comment = "post-box";'> 
                 </form>
@@ -31,10 +39,9 @@
 
 </head>
 <body>
-
 <!-- Recursive template rendering for lists with sub-lists -->
 {{block "comment-list-element" .}} 
-{{template "list" .}} 
+{{template "list" .Comments}} 
 {{end}}
 <script src="/static/mailIndex.js"></script>
 </body>
@@ -58,7 +65,8 @@
 
             <div class="item-box">
                 <div class="comment">
-                    <span class="title-text">{{.Message}}</span>
+
+                    <span class="title-text">{{.User}} wrote: <br>{{.Message}}</span>
                     <br>
                     {{if .Picture}}
                         <img src="{{(printf "/downloads/%s" .Picture)}}"  width="800" height="auto">
@@ -70,26 +78,25 @@
 
                     <!-- Reply button for all items -->
                     <!-- <button class="reply-button" data-reply-target="{{ $replyBoxId }}">Comments</button> -->
-                    <a href="{{(printf "/mail/%s" .Id)}}" >comments</a> 
+                    <a href="{{(printf "/mail/%s" .Id)}}" >Continue This Conversation</a> 
 
                     {{if .Editable}}
-                        <!-- Edit button for all items -->
+                        <!-- Edit button removed for mail index 
                         <button class="edit-button" data-edit-target="{{ $editBoxId }}">Edit</button>
-                        <button class="pic-button" data-pic-target="{{ $picBoxId }}">Pic</button>
+                        -->
 
                         <div class="pic-box">
-                        <!--    <form class="form-horizontal" id="{{ $picBoxId }}" method="post" action="/upload" enctype="multipart/form-data" name = "filesForm" > -->
+                        <!--    
                         <form class="form-horizontal" id="{{ $picBoxId }}" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#comment-list" hx-post="/mailUpload" >    
                             <div class="input-group">
                                 <input type = "hidden" name = "root" class="root_input" value = "" />
                                 <input type = "hidden" name = "id" value ="{{.Id}}" />
-                               <!-- <input type = "hidden" name = "source" value = "index" /> -->
                                 <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitForm('{{ $picBoxId }}')"> 
                                 <button type="submit" style="display: none;">Upload</button>
-                               <!-- <button id="myfiles" type="file">Upload</button> -->
                             </div>
                         </form>
-                        </div>                   
+                        </div>  
+                    -->                 
                     {{end}}
                 </div>
             </div>

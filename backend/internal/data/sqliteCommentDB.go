@@ -98,7 +98,7 @@ func (db *SqliteCommentDB) GetRootMail(username string) *[]Comment {
 	rows, err := db.database.Query(`SELECT id, user, message, picture, parent, root, sticky, created_at
     					   FROM comment
     					   WHERE root = ? AND parent LIKE ?
-						   ORDER BY created_at;`, 1, "%"+username+"%")
+						   ORDER BY created_at DESC;`, 1, "%"+username+"%")
 
 	if err != nil {
 		log.Fatal(err)
@@ -132,7 +132,7 @@ func (db *SqliteCommentDB) GetRootComments(username string) *[]Comment {
 	rows, err := db.database.Query(`SELECT id, user, message, picture, parent, root, sticky, created_at
     					   FROM comment
     					   WHERE root = 1 and parent = 'root'
-						   ORDER BY created_at;`)
+						   ORDER BY created_at DESC;`)
 
 	if err != nil {
 		log.Fatal(err)

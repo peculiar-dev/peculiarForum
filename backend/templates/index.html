@@ -4,6 +4,9 @@
     integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" 
     crossorigin="anonymous">
 </script>
+<!--
+<script src="/static/index.js"></script>
+-->
 <script>
 
     document.addEventListener('htmx:afterSettle',function(evt){
@@ -18,7 +21,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/index.css">
     <title>Index</title>
-    <h2>Main Page</h2>
+
+    {{ template "header" . }}
+
+    <!--
+    <div id="external-content" 
+         hx-get="/static/header.html" 
+         hx-trigger="load" 
+         hx-target="#external-content" 
+         hx-swap="outerHTML">
+    </div>
+    -->
+
     <button class="post-button" >Post</button>
             <!-- Reply box that will show/hide when reply button is clicked -->
             <div id="post-box" class="post-box">
@@ -36,7 +50,9 @@
 {{block "comment-list-element" .}} 
 {{template "list" .}} 
 {{end}}
+
 <script src="/static/index.js"></script>
+
 </body>
 </html>
 <!-- Recursive List Template Definition -->
@@ -70,7 +86,7 @@
 
                     <!-- Reply button for all items -->
                     <!-- <button class="reply-button" data-reply-target="{{ $replyBoxId }}">Comments</button> -->
-                    <a href="{{(printf "/comment/%s" .Id)}}" >comments</a> 
+                    <a class="link-button" href="{{(printf "/comment/%s" .Id)}}" >comments</a> 
 
                     {{if .Editable}}
                         <!-- Edit button for all items -->
@@ -84,7 +100,7 @@
                                 <input type = "hidden" name = "root" class="root_input" value = "" />
                                 <input type = "hidden" name = "id" value ="{{.Id}}" />
                                 <!--  <input type = "hidden" name = "source" value = "index" /> -->
-                                <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitForm('{{ $picBoxId }}')"> 
+                                <input type="file" name="myfiles" id="myfiles" class="form-input input-lg" onchange="autoSubmitForm('{{ $picBoxId }}')"> 
                                 <button type="submit" style="display: none;">Upload</button>
                                <!-- <button id="myfiles" type="file">Upload</button> -->
                             </div>

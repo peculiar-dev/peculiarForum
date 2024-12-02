@@ -1,6 +1,10 @@
     var current_comment = "";
     var current_root = window.location.pathname.split('/')[2];
-   
+   /*
+    document.addEventListener('htmx:afterSettle',function(evt){
+        init(); 
+    });
+*/
     init();
     function autoSubmitForm(formID) {
         //document.getElementById(formID).submit();
@@ -8,6 +12,7 @@
         if (form) {
             // Trigger the HTMX post
             htmx.trigger(form, 'submit');
+            console.log("fired submit to autosubmit picture form.");
         }
     }
 
@@ -20,8 +25,6 @@
             console.log("found");
             elements[i].value = current_root;
         }
-
-
 
     // JavaScript to handle collapsible actions
     document.querySelectorAll('.collapse-button').forEach(button => {
@@ -71,6 +74,7 @@
             const picBoxId = this.getAttribute('data-pic-target');
             const picBox = document.getElementById(picBoxId);
             picBox.myfiles.click();
+            console.log("adding click event to pic button");
         });
     });
 

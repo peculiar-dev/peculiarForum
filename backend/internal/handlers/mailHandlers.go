@@ -14,10 +14,16 @@ import (
 
 type MailHandler struct {
 	comments data.Commentdb
+	users    data.Userdb
 }
 
-func NewMailHandler(commentdb data.Commentdb) *MailHandler {
-	return &MailHandler{comments: commentdb}
+type MailIndexData struct {
+	Comments *[]data.Comment
+	Users    *[]data.User
+}
+
+func NewMailHandler(commentdb data.Commentdb, userdb data.Userdb) *MailHandler {
+	return &MailHandler{comments: commentdb, users: userdb}
 }
 
 func (mail *MailHandler) IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -28,10 +34,21 @@ func (mail *MailHandler) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("In Mail index, user:", username)
-	currentComments := mail.comments.GetRootMail(username)
+	//currentComments := mail.comments.GetRootMail(username)
+	var indexData MailIndexData
+	indexData.Comments = mail.comments.GetRootMail(username)
+	indexData.Users = mail.users.GetUsers()
 
-	tmpl := template.Must(template.ParseFiles("templates/mailIndex.html"))
-	tmpl.Execute(w, currentComments)
+	tmpl, err := template.ParseFiles("templates/header.html", "templates/mailIndex.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	//err = tmpl.ExecuteTemplate(w, "mailIndex.html", currentComments)
+	err = tmpl.ExecuteTemplate(w, "mailIndex.html", indexData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 
 }
 
@@ -44,6 +61,7 @@ func (mail *MailHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.Header.Get("X-User")
 	message := r.FormValue("comment")
 	parent := r.FormValue("parent")
+	//recipient := r.FormValue("user")
 
 	if username == "" {
 		username = "test"
@@ -58,14 +76,75 @@ func (mail *MailHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	//fmt.Printf("comment:%v\n", comment)
 
 	mail.comments.InsertComment(id, username, message, parent, bRoot, bSticky)
+	//mail.comments.InsertComment(id, username, message, username+"-"+recipient, bRoot, bSticky)
 
-	log.Println("printing comments from:", r.FormValue("root"))
+	log.Println("printing mail comments from:", r.FormValue("root"))
 	currentComments := mail.comments.GetMailComments(r.FormValue("root"), username)
 	log.Println("message:", r.FormValue("comment"))
 
 	tpl := template.Must(template.ParseFiles("templates/mail.html"))
 
 	tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+}
+
+func (mail *MailHandler) IndexAddHandler(w http.ResponseWriter, r *http.Request) {
+
+	var bRoot bool
+	var bSticky bool
+
+	id := uuid.New().String()
+	username := r.Header.Get("X-User")
+	message := r.FormValue("comment")
+	//parent := r.FormValue("parent")
+	recipient := r.FormValue("user")
+	bRoot = true
+
+	if username == "" {
+		username = "test"
+	}
+	//root := r.FormValue("root") // make boolean?
+	//sticky := r.FormValue("sticky") // make boolean?
+
+	//parent = parent[10:] // strip javascript identifier
+	//comment := Comment{Id: id, User: username, Message: message, Root: bRoot, Sticky: bSticky, Sublist: nil}
+
+	fmt.Printf("parent: %s\n", username+"-"+recipient)
+	//fmt.Printf("comment:%v\n", comment)
+
+	//mail.comments.InsertComment(id, username, message, parent, bRoot, bSticky)
+	mail.comments.InsertComment(id, username, message, username+"-"+recipient, bRoot, bSticky)
+
+	/*
+		log.Println("printing mail comments from:", r.FormValue("root"))
+		currentComments := mail.comments.GetMailComments(r.FormValue("root"), username)
+		log.Println("message:", r.FormValue("comment"))
+
+		tpl := template.Must(template.ParseFiles("templates/mail.html"))
+
+		tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	*/
+
+	log.Println("In Mail index add, user:", username)
+	//currentComments := mail.comments.GetRootMail(username)
+	var indexData MailIndexData
+	indexData.Comments = mail.comments.GetRootMail(username)
+	indexData.Users = mail.users.GetUsers()
+
+	/*
+		tmpl, err := template.ParseFiles("templates/header.html", "templates/mailIndex.html")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		//err = tmpl.ExecuteTemplate(w, "mailIndex.html", currentComments)
+		err = tmpl.ExecuteTemplate(w, "mailIndex.html", indexData)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	*/
+	tpl := template.Must(template.ParseFiles("templates/mailIndex.html"))
+
+	tpl.ExecuteTemplate(w, "comment-list-element", indexData)
 }
 
 func (mail *MailHandler) IDHandler(w http.ResponseWriter, r *http.Request) {

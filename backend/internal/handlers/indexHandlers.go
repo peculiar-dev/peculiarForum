@@ -30,8 +30,18 @@ func (index *IndexHandler) IndexHandler(w http.ResponseWriter, r *http.Request) 
 	log.Println("In index, user:", username)
 	currentComments := index.comments.GetRootComments(username)
 
-	tmpl := template.Must(template.ParseFiles("templates/index.html"))
-	tmpl.Execute(w, currentComments)
+	//tmpl := template.Must(template.ParseFiles("templates/header.html", "templates/index.html"))
+	//tmpl.ExecuteTemplate(w, "index", currentComments)
+	tmpl, err := template.ParseFiles("templates/header.html", "templates/index.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = tmpl.ExecuteTemplate(w, "index.html", currentComments)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	//tmpl.Execute(w, currentComments)
 
 }
 

@@ -85,28 +85,29 @@ func main() {
 	}
 
 	indexhandler := handlers.NewIndexHandler(commentsdb)
-	mailhandler := handlers.NewMailHandler(commentsdb)
+	mailhandler := handlers.NewMailHandler(commentsdb, userdb)
 	commentHandler := handlers.NewCommentHandler(commentsdb)
 
 	http.Handle("/downloads/", http.StripPrefix("/downloads/", http.FileServer(http.Dir("./downloads"))))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	http.HandleFunc("/healthcheck", healthCheck)
 
-	//index
+	//comment index
 
 	http.HandleFunc("/", indexhandler.IndexHandler)
 	http.HandleFunc("/indexAddComment", indexhandler.AddHandler)
 	http.HandleFunc("/indexEditComment", indexhandler.EditHandler)
 	http.HandleFunc("/indexUpload", indexhandler.UploadHandler)
 
-	//mail
+	//mail index
 
 	http.HandleFunc("/mailIndex", mailhandler.IndexHandler)
+	http.HandleFunc("/indexAddHandler", mailhandler.IndexAddHandler)
 	http.HandleFunc("/mailadd", mailhandler.AddHandler)
 	http.HandleFunc("/mail/{id}/", mailhandler.IDHandler)
 	http.HandleFunc("/mailUpload", mailhandler.UploadHandler)
 
-	//comments
+	//collapsable comment view
 
 	http.HandleFunc("/collapseadd", commentHandler.AddHandler)
 	http.HandleFunc("/collapseedit", commentHandler.EditHandler)

@@ -98,6 +98,9 @@ func (db *SqliteUserDB) LoadTestUsers() {
 
 	db.InsertUser(User{Username: "test", Created: time.Now(), LastLogin: time.Now()})
 	db.InsertUser(User{Username: "test2", Created: time.Now(), LastLogin: time.Now()})
+	db.InsertUser(User{Username: "test3", Created: time.Now(), LastLogin: time.Now()})
+	db.InsertUser(User{Username: "test4", Created: time.Now(), LastLogin: time.Now()})
+	db.InsertUser(User{Username: "test5", Created: time.Now(), LastLogin: time.Now()})
 
 }
 

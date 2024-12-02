@@ -10,7 +10,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/index.css">
-    <title>Recursive Collapsible List</title>
+
 </head>
 <body>
 
@@ -52,7 +52,7 @@
 
                 <div class="pic-box">
                 <!--    <form class="form-horizontal" id="{{ $picBoxId }}" method="post" action="/upload" enctype="multipart/form-data" name = "filesForm" > -->
-                <form class="form-horizontal" id="{{ $picBoxId }}" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#comment-list" hx-post="/upload" >    
+                <form class="form-horizontal" id="{{ $picBoxId }}" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#comment-list" hx-post="/mailUpload" >    
                     <div class="input-group">
                         <input type = "hidden" name = "root" class="root_input" value = "" />
                         <input type = "hidden" name = "id" value ="{{.Id}}" />
