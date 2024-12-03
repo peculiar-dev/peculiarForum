@@ -75,7 +75,7 @@ func (mail *MailHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("parent: %s\n", parent)
 	//fmt.Printf("comment:%v\n", comment)
 
-	mail.comments.InsertComment(id, username, message, parent, bRoot, bSticky)
+	mail.comments.InsertComment(id, r.FormValue("root"), username, message, parent, bRoot, bSticky)
 	//mail.comments.InsertComment(id, username, message, username+"-"+recipient, bRoot, bSticky)
 
 	log.Println("printing mail comments from:", r.FormValue("root"))
@@ -112,7 +112,7 @@ func (mail *MailHandler) IndexAddHandler(w http.ResponseWriter, r *http.Request)
 	//fmt.Printf("comment:%v\n", comment)
 
 	//mail.comments.InsertComment(id, username, message, parent, bRoot, bSticky)
-	mail.comments.InsertComment(id, username, message, username+"-"+recipient, bRoot, bSticky)
+	mail.comments.InsertComment(id, "", username, message, username+"-"+recipient, bRoot, bSticky)
 
 	/*
 		log.Println("printing mail comments from:", r.FormValue("root"))

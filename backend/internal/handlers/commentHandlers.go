@@ -63,7 +63,7 @@ func (ch *CommentHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("parent: %s\n", parent)
 	//fmt.Printf("comment:%v\n", comment)
 
-	ch.comments.InsertComment(id, username, message, parent, bRoot, bSticky)
+	ch.comments.InsertComment(id, r.FormValue("root"), username, message, parent, bRoot, bSticky)
 	/*
 		AddCommentToSublist(&comments, parent, comment)
 		log.Println("added to sublist")

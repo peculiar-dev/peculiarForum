@@ -13,6 +13,7 @@ import (
 
 type Comment struct {
 	Id       string    // the UUID of this comment
+	RootId   string    // the UUID of this comment's root comment
 	User     string    // The Username of the creator
 	Message  string    // The comment message
 	Picture  string    // The picture uploaded with this comment
@@ -68,15 +69,15 @@ func (db *SqliteCommentDB) InitDB() {
 
 func (db *SqliteCommentDB) LoadTestComments() {
 
-	db.InsertComment("id-1", "test", "test message 1", "root", true, false)
-	db.InsertComment("id-2", "test", "test message 2", "id-1", false, false)
-	db.InsertComment("id-3", "test", "test message 3", "id-1", false, false)
-	db.InsertComment("id-4", "test2", "test message 4", "id-3", false, false)
-	db.InsertComment("id-5", "test2", "test message 5", "root", true, false)
-	db.InsertComment("id-6", "test", "test message 6", "id-5", false, false)
-	db.InsertComment("id-7", "test2", "test message 7", "id-5", false, false)
-	db.InsertComment("id-8", "test", "test mail message 1", "test2-test", true, false)
-	db.InsertComment("id-9", "test2", "test mail message 2", "test-test2", true, false)
+	db.InsertComment("id-1", "", "test", "test message 1", "root", true, false)
+	db.InsertComment("id-2", "id-1", "test", "test message 2", "id-1", false, false)
+	db.InsertComment("id-3", "id-1", "test", "test message 3", "id-1", false, false)
+	db.InsertComment("id-4", "id-1", "test2", "test message 4", "id-3", false, false)
+	db.InsertComment("id-5", "", "test2", "test message 5", "root", true, false)
+	db.InsertComment("id-6", "id-5", "test", "test message 6", "id-5", false, false)
+	db.InsertComment("id-7", "id-5", "test2", "test message 7", "id-5", false, false)
+	db.InsertComment("id-8", "", "test", "test mail message 1", "test2-test", true, false)
+	db.InsertComment("id-9", "", "test2", "test mail message 2", "test-test2", true, false)
 
 	//test child comment logic.
 	db.GetChildComments("id-1", "test")
@@ -255,6 +256,7 @@ func (db *SqliteCommentDB) CreateCommentTable() {
 
 	createTableSQL := `CREATE TABLE comment (
 	"id" TEXT,
+	"root_id" TEXT,
 	"user" TEXT,
 	"message" TEXT,
 	"picture" TEXT,
@@ -273,19 +275,19 @@ func (db *SqliteCommentDB) CreateCommentTable() {
 	log.Println("comment table created")
 }
 
-func (db *SqliteCommentDB) InsertComment(id, user, message, parent string, root bool, sticky bool) {
+func (db *SqliteCommentDB) InsertComment(id, rootID, user, message, parent string, root bool, sticky bool) {
 	currentTime := time.Now()
 
 	message = strings.Replace(message, "\n", "<br>", -1)
 
 	log.Println("Inserting comment record ...")
-	insertCommentSQL := `INSERT INTO comment(id, user, message,picture, parent,root,sticky,created_at) VALUES (?, ?, ?, ?, ?, ?, ?,?)`
+	insertCommentSQL := `INSERT INTO comment(id, root_id, user, message,picture, parent,root,sticky,created_at) VALUES (?,?, ?, ?, ?, ?, ?, ?,?)`
 	statement, err := db.database.Prepare(insertCommentSQL) // Prepare statement.
 	// This is good to avoid SQL injections
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	_, err = statement.Exec(id, user, message, "", parent, root, sticky, currentTime)
+	_, err = statement.Exec(id, rootID, user, message, "", parent, root, sticky, currentTime)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -347,7 +349,7 @@ func addCommentToSublist(comments *[]Comment, id string, newComment Comment) boo
 	return false
 }
 
-// Helper function to print items and their sublists
+// Helper function to print comments and their sublists
 func PrintComments(comments *[]Comment, indent string) {
 	for _, comment := range *comments {
 		fmt.Println(indent+"Comment:", comment.Message)

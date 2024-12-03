@@ -60,7 +60,7 @@ func (index *IndexHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 		username = "test"
 	}
 
-	index.comments.InsertComment(id, username, message, parent, bRoot, bSticky)
+	index.comments.InsertComment(id, "", username, message, parent, bRoot, bSticky)
 
 	log.Println("In add index, user:", username)
 	currentComments := index.comments.GetRootComments(username)

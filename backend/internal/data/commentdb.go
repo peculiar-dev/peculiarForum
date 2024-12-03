@@ -15,7 +15,7 @@ type Commentdb interface {
 	GetMailComments(parentID string, username string) *[]Comment
 	GetChildComments(parentID string, username string) *[]Comment
 	CreateCommentTable()
-	InsertComment(id, user, message, parent string, root bool, sticky bool)
+	InsertComment(id, rootID, user, message, parent string, root bool, sticky bool)
 	EditComment(id, message, parent string, root bool, sticky bool)
 	EditCommentPic(id, picture string)
 }
