@@ -1,6 +1,12 @@
     var current_comment = "";
     var current_root = window.location.pathname.split('/')[2];
-   
+
+    console.log(window.location.pathname.split('/')[3])
+
+    if (window.location.pathname.split('/')[3]){
+        current_comment = "reply-box-"+window.location.pathname.split('/')[3];
+    }
+
     init();
     function autoSubmitForm(formID) {
         //document.getElementById(formID).submit();
@@ -92,27 +98,30 @@
         });
     });
 
-    }
-
-    document.addEventListener('htmx:afterSettle',function(evt){
-
-        init();  
+    console.log("current comment before if:"+current_comment);
         if (current_comment){
             recent = document.getElementById(current_comment).parentElement.children[1]
-            //document.getElementById(current_comment).parentElement.nextElementSibling
-            console.log(recent.className)
-            console.log(recent.tagName)
+            console.log("recent classname:"+recent.className)
+            console.log("recent tagname:"+recent.tagName)
             if (recent){
+                recent.focus();
                 currentItem = recent;
                 while (currentItem && currentItem.tagName !== 'BODY'){
                     if (currentItem.className==="collapsible-content"){
                         currentItem.style.display = 'block';
-                        console.log(currentItem.id)
-                        console.log(currentItem.style.display)
+                        console.log("Current Item ID:"+currentItem.id)
+                        console.log("Current Item Style.display:"+currentItem.style.display)
                     }
                     currentItem = currentItem.parentElement;
                 }
             
             }
-        }   
+        } 
+
+    }
+
+    document.addEventListener('htmx:afterSettle',function(evt){
+
+        init();  
+          
     });

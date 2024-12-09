@@ -36,6 +36,7 @@
         
             {{ $itemId := (printf "item-%s" .Id) }} <!-- Unique ID for each item -->
             {{ $replyBoxId := (printf "reply-box-%s" .Id) }} <!-- Unique ID for each reply box -->
+            {{ $replyToId := (printf "%s" .User) }} <!-- Unique ID for each reply box -->
             {{ $editBoxId := (printf "edit-box-%s" .Id) }} <!-- Unique ID for each reply box -->
             {{ $picBoxId := (printf "pic-box-%s" .Id) }} <!-- Unique ID for each reply box -->
             {{ $collapseContentId := (printf "collapse-content-%s" .Id) }} <!-- Unique ID for each collapsible content -->
@@ -109,6 +110,7 @@
             <!--     <button class="send-button">Send</button> -->
                <form hx-swap="innerHTML" hx-target="#comment-list" hx-post="/collapseadd"> 
                     <input type = "hidden" name = "parent" value = "{{ $replyBoxId }}" />
+                    <input type = "hidden" name = "replyTo" value = "{{ $replyToId }}" />
                     <input type = "hidden" name = "root" class="root_input" value = "" />
                     <input type = "hidden" name = "source" value = "comment" />
                    <!-- <input type="textarea" name="comment" id="comment" placeholder="Write your reply here..."> -->

@@ -86,7 +86,8 @@ func main() {
 
 	indexhandler := handlers.NewIndexHandler(commentsdb)
 	mailhandler := handlers.NewMailHandler(commentsdb, userdb)
-	commentHandler := handlers.NewCommentHandler(commentsdb)
+	commentHandler := handlers.NewCommentHandler(commentsdb, notificationdb)
+	notificationHandler := handlers.NewNotificationHandler(notificationdb)
 
 	http.Handle("/downloads/", http.StripPrefix("/downloads/", http.FileServer(http.Dir("./downloads"))))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
@@ -113,6 +114,10 @@ func main() {
 	http.HandleFunc("/collapseedit", commentHandler.EditHandler)
 	http.HandleFunc("/comment/{id}/", commentHandler.IDHandler)
 	http.HandleFunc("/commentUpload", commentHandler.UploadHandler)
+
+	// notifications
+
+	http.HandleFunc("/notifications", notificationHandler.IndexHandler)
 
 	log.Println("Starting server on port: " + port)
 

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/index.css">
+    <title>Index</title>
+
+    {{ template "header" . }}
+
+</head>
+<body>
+    <ul id="notification-list" style="list-style-type:none; padding-left: 0;">
+    {{range .}} 
+    <li> <a class="notification-button" href={{.CommentLink}} >Mail</a> </li>    
+
+    {{end}} 
+    </ul>

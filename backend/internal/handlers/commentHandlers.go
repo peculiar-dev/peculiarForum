@@ -8,16 +8,18 @@ import (
 	"net/http"
 	"os"
 	"peculiarity/internal/data"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 type CommentHandler struct {
-	comments data.Commentdb
+	comments      data.Commentdb
+	notifications data.Notificationdb
 }
 
-func NewCommentHandler(commentdb data.Commentdb) *CommentHandler {
-	return &CommentHandler{comments: commentdb}
+func NewCommentHandler(commentdb data.Commentdb, notificationdb data.Notificationdb) *CommentHandler {
+	return &CommentHandler{comments: commentdb, notifications: notificationdb}
 }
 
 func (ch *CommentHandler) IDHandler(w http.ResponseWriter, r *http.Request) {
@@ -50,6 +52,7 @@ func (ch *CommentHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.Header.Get("X-User")
 	message := r.FormValue("comment")
 	parent := r.FormValue("parent")
+	replyTo := r.FormValue("replyTo")
 
 	if username == "" {
 		username = "test"
@@ -64,6 +67,10 @@ func (ch *CommentHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	//fmt.Printf("comment:%v\n", comment)
 
 	ch.comments.InsertComment(id, r.FormValue("root"), username, message, parent, bRoot, bSticky)
+	/* db.InsertNotification(Notification{Sender: "test2", Reciever: "test", CommentLink: "/comment/id-1/id-2", Created: time.Now()})
+	 */
+	link := "/comment/" + r.FormValue("root") + "/" + id
+	ch.notifications.InsertNotification(data.Notification{Sender: username, Reciever: replyTo, CommentLink: link, Created: time.Now()})
 	/*
 		AddCommentToSublist(&comments, parent, comment)
 		log.Println("added to sublist")

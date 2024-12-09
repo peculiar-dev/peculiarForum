@@ -13,7 +13,7 @@ type Notification struct {
 	Sender      string    // the user who sent this notification
 	Reciever    string    // the user who is to recieve this notification
 	Created     time.Time // Creation timestamp
-	CommentUUID string    // the UUID of the relevant comment
+	CommentLink string    // Link to the relevant comment
 }
 
 type SqliteNotificationDB struct {
@@ -66,7 +66,7 @@ func (db *SqliteNotificationDB) CreateNotificationTable() {
 	createTableSQL := `CREATE TABLE notification (
 	"sender" TEXT,
 	"reciever" TEXT,
-	"commentUUID" TEXT,
+	"commentLink" TEXT,
 	"created_at" DATETIME
 	);`
 
@@ -83,24 +83,35 @@ func (db *SqliteNotificationDB) InsertNotification(notification Notification) {
 	currentTime := time.Now()
 
 	log.Println("Inserting notification record ...")
-	insertNotificationSQL := `INSERT INTO notification(sender, reciever, commentUUID, created_at) VALUES (?, ?, ?, ?)`
+	insertNotificationSQL := `INSERT INTO notification(sender, reciever, commentLink, created_at) VALUES (?, ?, ?, ?)`
 	statement, err := db.database.Prepare(insertNotificationSQL) // Prepare statement.
 	// This is good to avoid SQL injections
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	_, err = statement.Exec(notification.Sender, notification.Reciever, notification.CommentUUID, currentTime)
+	_, err = statement.Exec(notification.Sender, notification.Reciever, notification.CommentLink, currentTime)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 }
 
 func (db *SqliteNotificationDB) LoadTestNotifications() {
+	/*
+		db.InsertComment("id-1", "", "test", "test message 1", "root", true, false)
+		db.InsertComment("id-2", "id-1", "test", "test message 2", "id-1", false, false)
+		db.InsertComment("id-3", "id-1", "test", "test message 3", "id-1", false, false)
+		db.InsertComment("id-4", "id-1", "test2", "test message 4", "id-3", false, false)
+		db.InsertComment("id-5", "", "test2", "test message 5", "root", true, false)
+		db.InsertComment("id-6", "id-5", "test", "test message 6", "id-5", false, false)
+		db.InsertComment("id-7", "id-5", "test2", "test message 7", "id-5", false, false)
+		db.InsertComment("id-8", "", "test", "test mail message 1", "test2-test", true, false)
+		db.InsertComment("id-9", "", "test2", "test mail message 2", "test-test2", true, false)
+	*/
 
-	db.InsertNotification(Notification{Sender: "test2", Reciever: "test", CommentUUID: "id-1", Created: time.Now()})
-	db.InsertNotification(Notification{Sender: "test2", Reciever: "test", CommentUUID: "id-1", Created: time.Now()})
-	db.InsertNotification(Notification{Sender: "test", Reciever: "test2", CommentUUID: "id-5", Created: time.Now()})
-	db.InsertNotification(Notification{Sender: "test", Reciever: "test2", CommentUUID: "id-5", Created: time.Now()})
+	db.InsertNotification(Notification{Sender: "test2", Reciever: "test", CommentLink: "/comment/id-1/id-2", Created: time.Now()})
+	db.InsertNotification(Notification{Sender: "test2", Reciever: "test", CommentLink: "/comment/id-1/id-3", Created: time.Now()})
+	db.InsertNotification(Notification{Sender: "test", Reciever: "test2", CommentLink: "/comment/id-5/id-6", Created: time.Now()})
+	db.InsertNotification(Notification{Sender: "test", Reciever: "test2", CommentLink: "/comment/id-5/id-7", Created: time.Now()})
 
 }
 
@@ -108,22 +119,22 @@ func (db *SqliteNotificationDB) GetNotifications(username string) *[]Notificatio
 
 	var notifications []Notification
 	var sender string
-	var commentUUID string
+	var commentLink string
 	var created time.Time
 
-	rows, err := db.database.Query(`SELECT sender, commentUUID, created_at
+	rows, err := db.database.Query(`SELECT sender, commentLink, created_at
     					   FROM notification
 						   WHERE reciever = ?
-						   ORDER BY created_at;`, username)
+						   ORDER BY created_at DESC;`, username)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer rows.Close()
 	log.Println(username + " notifications:")
 	for rows.Next() {
-		rows.Scan(&sender, &commentUUID, &created)
+		rows.Scan(&sender, &commentLink, &created)
 
-		notifications = append(notifications, Notification{Sender: sender, Reciever: username, CommentUUID: commentUUID, Created: created})
+		notifications = append(notifications, Notification{Sender: sender, Reciever: username, CommentLink: commentLink, Created: created})
 	}
 
 	return &notifications
