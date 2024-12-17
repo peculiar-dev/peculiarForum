@@ -13,6 +13,7 @@ type User struct {
 	Username  string    // Username of this user
 	Created   time.Time // Creation timestamp
 	LastLogin time.Time // Last Login timestamp
+	Theme     string    // user's current theme
 
 }
 
@@ -60,13 +61,15 @@ func (db *SqliteUserDB) CreateUserTable() {
 		Username  string    // Username of this user
 		Created   time.Time // Creation timestamp
 		LastLogin time.Time // Last Login timestamp
+		Theme     string    // user's current theme
 
 	*/
 
 	createTableSQL := `CREATE TABLE user (
 	"username" TEXT,
 	"created_at" DATETIME,
-	"lastlogin_at" DATETIME
+	"lastlogin_at" DATETIME,
+	"theme" TEXT
 	);`
 
 	log.Println("Create User table...")
@@ -78,17 +81,33 @@ func (db *SqliteUserDB) CreateUserTable() {
 	log.Println("user table created")
 }
 
-func (db *SqliteUserDB) InsertUser(user User) {
+func (db *SqliteUserDB) InsertUser(user *User) {
 	currentTime := time.Now()
 
 	log.Println("Inserting user record ...")
-	insertUserSQL := `INSERT INTO user(username, created_at, lastlogin_at) VALUES (?, ?, ?)`
+	insertUserSQL := `INSERT INTO user(username, created_at, lastlogin_at, theme) VALUES (?, ?, ?, ?)`
 	statement, err := db.database.Prepare(insertUserSQL) // Prepare statement.
 	// This is good to avoid SQL injections
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	_, err = statement.Exec(user.Username, currentTime, currentTime)
+	_, err = statement.Exec(user.Username, currentTime, currentTime, user.Theme)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+}
+
+func (db *SqliteUserDB) UpdateUser(user *User) {
+	currentTime := time.Now()
+
+	log.Println("Updating user record ...")
+	updateUserSQL := `UPDATE user SET theme = ?, lastlogin_at = ?  WHERE username = ?`
+	statement, err := db.database.Prepare(updateUserSQL) // Prepare statement.
+	// This is good to avoid SQL injections
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	_, err = statement.Exec(user.Theme, currentTime, user.Username)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -96,11 +115,11 @@ func (db *SqliteUserDB) InsertUser(user User) {
 
 func (db *SqliteUserDB) LoadTestUsers() {
 
-	db.InsertUser(User{Username: "test", Created: time.Now(), LastLogin: time.Now()})
-	db.InsertUser(User{Username: "test2", Created: time.Now(), LastLogin: time.Now()})
-	db.InsertUser(User{Username: "test3", Created: time.Now(), LastLogin: time.Now()})
-	db.InsertUser(User{Username: "test4", Created: time.Now(), LastLogin: time.Now()})
-	db.InsertUser(User{Username: "test5", Created: time.Now(), LastLogin: time.Now()})
+	db.InsertUser(&User{Username: "test", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
+	db.InsertUser(&User{Username: "test2", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
+	db.InsertUser(&User{Username: "test3", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
+	db.InsertUser(&User{Username: "test4", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
+	db.InsertUser(&User{Username: "test5", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
 
 }
 
@@ -110,8 +129,9 @@ func (db *SqliteUserDB) GetUsers() *[]User {
 	var username string
 	var created time.Time
 	var lastLogin time.Time
+	var theme string
 
-	rows, err := db.database.Query(`SELECT username, created_at, lastlogin_at
+	rows, err := db.database.Query(`SELECT username, created_at, lastlogin_at, theme
     					   FROM user
 						   ORDER BY username;`)
 	if err != nil {
@@ -123,8 +143,32 @@ func (db *SqliteUserDB) GetUsers() *[]User {
 		rows.Scan(&username, &created, &lastLogin)
 		log.Println("Username: ", username)
 
-		users = append(users, User{Username: username, Created: created, LastLogin: lastLogin})
+		users = append(users, User{Username: username, Created: created, LastLogin: lastLogin, Theme: theme})
 	}
 
 	return &users
+}
+
+func (db *SqliteUserDB) GetUser(username string) *User {
+
+	var user User
+	var created time.Time
+	var lastLogin time.Time
+	var theme string
+
+	rows, err := db.database.Query(`SELECT username, created_at, lastlogin_at, theme
+    					   FROM user
+						   Where username = ?
+						   ORDER BY username;`, username)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	log.Println("got User:" + username)
+	for rows.Next() {
+		rows.Scan(&username, &created, &lastLogin, &theme)
+		user = User{Username: username, Created: created, LastLogin: lastLogin, Theme: theme}
+	}
+
+	return &user
 }

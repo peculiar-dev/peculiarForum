@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/themes/{{.User.Theme}}/index.css">
+    <title>Index</title>
+
+    {{ template "header" . }}
+
+</head>
+<body>
+    {{ $theme := .User.Theme }}
+    <div class="instructions">Modify User Settings below:</div>
+    <form action="/userUpdate"> 
+        <label for="theme">Choose a Theme: </label>
+        <select id="theme" name="theme">
+            {{range .Themes}}
+            <option value="{{.}}" {{ if eq . $theme }}selected{{ end }}>{{.}} </option>
+            {{end}}
+        </select>
+        <input value="Submit" type="submit" > 
+    </form>
+</body>

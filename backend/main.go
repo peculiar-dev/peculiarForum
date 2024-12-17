@@ -88,6 +88,7 @@ func main() {
 	mailhandler := handlers.NewMailHandler(commentsdb, userdb)
 	commentHandler := handlers.NewCommentHandler(commentsdb, notificationdb)
 	notificationHandler := handlers.NewNotificationHandler(notificationdb)
+	userHandler := handlers.NewUserHandler(userdb)
 
 	http.Handle("/downloads/", http.StripPrefix("/downloads/", http.FileServer(http.Dir("./downloads"))))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
@@ -118,6 +119,11 @@ func main() {
 	// notifications
 
 	http.HandleFunc("/notifications", notificationHandler.IndexHandler)
+
+	// user
+
+	http.HandleFunc("/user", userHandler.IndexHandler)
+	http.HandleFunc("/userUpdate", userHandler.UpdateHandler)
 
 	log.Println("Starting server on port: " + port)
 

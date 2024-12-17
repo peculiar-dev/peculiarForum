@@ -11,6 +11,8 @@ type Userdb interface {
 	InitDB()
 	CreateUserTable()
 	LoadTestUsers()
-	InsertUser(user User)
+	InsertUser(user *User)
+	UpdateUser(user *User)
 	GetUsers() *[]User
+	GetUser(username string) *User
 }
