@@ -11,16 +11,9 @@ services:
         source: ./proxy/.htpasswd
         target: /etc/nginx/conf.d/.htpasswd
         read_only: true
-      - /etc/ssl/certs:/usr/share/nginx/certs
+      - /etc/letsencrypt:/usr/share/nginx/certs
       - ./proxy/static:/usr/share/nginx/html/static
       - ./backend/downloads:/usr/share/nginx/html/results
-#    environment:
-#      - HTTP_PROXY=http://proxy.psu.edu:3128
-#      - HTTPS_PROXY=https://proxy.psu.edu:3128
-#      - http_proxy=http://proxy.psu.edu:3128
-#      - https_proxy=https://proxy.psu.edu:3128
-#      - no_proxy=localhost,127.0.0.1,127.0.0.0/8,::1,146.186.109.98,172.24.41.71,dev-web2.lionpath.psu.edu
-#      - NO_PROXY=localhost,127.0.0.1,127.0.0.0/8,::1,146.186.109.98,172.24.41.71,dev-web2.lionpath.psu.edu
     ports:
       - 80:80
       - 443:443
@@ -31,12 +24,5 @@ services:
     restart: "unless-stopped"
     build: 
       context: ./backend/
-#    environment:
-#      - HTTP_PROXY=http://proxy.psu.edu:3128
-#      - HTTPS_PROXY=https://proxy.psu.edu:3128
-#      - http_proxy=http://proxy.psu.edu:3128
-#      - https_proxy=https://proxy.psu.edu:3128
-#      - no_proxy=localhost,127.0.0.1,127.0.0.0/8,::1,146.186.109.98,172.24.41.71,dev-web2.lionpath.psu.edu
-#      - NO_PROXY=localhost,127.0.0.1,127.0.0.0/8,::1,146.186.109.98,172.24.41.71,dev-web2.lionpath.psu.edu
     volumes:
       - ./backend/downloads:/usr/src/app/downloads     
