@@ -12,8 +12,9 @@ services:
         target: /etc/nginx/conf.d/.htpasswd
         read_only: true
       - /etc/letsencrypt:/usr/share/nginx/certs
-      - ./proxy/static:/usr/share/nginx/html/static
-      - ./backend/downloads:/usr/share/nginx/html/results
+#      - ./proxy/static:/usr/share/nginx/html/static
+#      - ./backend/downloads:/usr/share/nginx/html/results
+
     ports:
       - 80:80
       - 443:443
@@ -26,3 +27,5 @@ services:
       context: ./backend/
     volumes:
       - ./backend/downloads:/usr/src/app/downloads     
+      - ./backend/static:/usr/src/app/static
+
