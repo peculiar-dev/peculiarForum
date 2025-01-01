@@ -66,10 +66,10 @@
             <div class="item-box">
                 <div class="comment">
 
-                    <span class="title-text">{{.User}} wrote: <br>{{.Message}}</span>
+                    <span class="title-text">{{.User}} wrote: <br><pre>{{.Message}}</pre></span>
                     <br>
                     {{if .Picture}}
-                        <img src="{{(printf "/downloads/%s" .Picture)}}"  width="800" height="auto">
+                        <img src="{{(printf "/downloads/%s" .Picture)}}"  width="400" height="auto">
                     {{end}}
                 </div>
                 

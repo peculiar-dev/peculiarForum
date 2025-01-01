@@ -44,10 +44,10 @@
 
             <div class="item-box">
                 <div class="comment">
-                    <span class="title-text">{{.Message}}</span>
+                    <span class="title-text"><pre>{{.Message}}</pre></span>
                     <br>
                     {{if .Picture}}
-                        <img src="{{(printf "/downloads/%s" .Picture)}}"  width="800" height="auto">
+                        <img src="{{(printf "/downloads/%s" .Picture)}}"  width="400" height="auto">
                     {{end}}
                 </div>
                 
@@ -72,7 +72,7 @@
                                 <input type = "hidden" name = "root" class="root_input" value = "" />
                                 <input type = "hidden" name = "id" value ="{{.Id}}" />
                                 <!-- <input type = "hidden" name = "source" value = "comment" /> -->
-                                <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitForm('{{ $picBoxId }}')"> 
+                                <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitForm('{{ $picBoxId }}',event)"> 
                                 <button type="submit" style="display: none;">Upload</button>
                                <!-- <button id="myfiles" type="file">Upload</button> -->
                             </div>

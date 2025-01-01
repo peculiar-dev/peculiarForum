@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
@@ -278,7 +277,7 @@ func (db *SqliteCommentDB) CreateCommentTable() {
 func (db *SqliteCommentDB) InsertComment(id, rootID, user, message, parent string, root bool, sticky bool) {
 	currentTime := time.Now()
 
-	message = strings.Replace(message, "\n", "<br>", -1)
+	//message = strings.Replace(message, "\n", "<br>", -1)
 
 	log.Println("Inserting comment record ...")
 	insertCommentSQL := `INSERT INTO comment(id, root_id, user, message,picture, parent,root,sticky,created_at) VALUES (?,?, ?, ?, ?, ?, ?, ?,?)`
@@ -296,7 +295,7 @@ func (db *SqliteCommentDB) InsertComment(id, rootID, user, message, parent strin
 func (db *SqliteCommentDB) EditComment(id, message, parent string, root bool, sticky bool) {
 	//currentTime := time.Now()
 
-	message = strings.Replace(message, "\n", "<br>", -1)
+	//message = strings.Replace(message, "\n", "<br>", -1)
 
 	log.Println("Editing comment record ...")
 	//insertCommentSQL := `INSERT INTO comment(id, user, message, parent,root,sticky,created_at) VALUES (?, ?, ?, ?, ?, ?,?)`
