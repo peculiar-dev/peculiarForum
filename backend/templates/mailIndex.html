@@ -69,7 +69,7 @@
                     <span class="title-text">{{.User}} wrote: <br><pre>{{.Message}}</pre></span>
                     <br>
                     {{if .Picture}}
-                        <img src="{{(printf "/downloads/%s" .Picture)}}"  width="400" height="auto">
+                        <img class="post-pic" src="{{(printf "/downloads/%s" .Picture)}}">
                     {{end}}
                 </div>
                 

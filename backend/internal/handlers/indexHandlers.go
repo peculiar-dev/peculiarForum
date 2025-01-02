@@ -14,10 +14,11 @@ import (
 
 type IndexHandler struct {
 	comments data.Commentdb
+	users    data.Userdb
 }
 
-func NewIndexHandler(commentdb data.Commentdb) *IndexHandler {
-	return &IndexHandler{comments: commentdb}
+func NewIndexHandler(commentdb data.Commentdb, userdb data.Userdb) *IndexHandler {
+	return &IndexHandler{comments: commentdb, users: userdb}
 }
 
 func (index *IndexHandler) IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,6 +26,12 @@ func (index *IndexHandler) IndexHandler(w http.ResponseWriter, r *http.Request) 
 	username := r.Header.Get("X-User")
 	if username == "" {
 		username = "test"
+	}
+
+	currentUser := index.users.GetUser(username)
+	if currentUser.Username == "" {
+		log.Println("User not found, calling userInit()")
+		index.users.InsertUser(&data.User{Username: username})
 	}
 
 	log.Println("In index, user:", username)

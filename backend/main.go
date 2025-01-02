@@ -84,7 +84,7 @@ func main() {
 		Addr: port,
 	}
 
-	indexhandler := handlers.NewIndexHandler(commentsdb)
+	indexhandler := handlers.NewIndexHandler(commentsdb, userdb)
 	mailhandler := handlers.NewMailHandler(commentsdb, userdb)
 	commentHandler := handlers.NewCommentHandler(commentsdb, notificationdb)
 	notificationHandler := handlers.NewNotificationHandler(notificationdb)

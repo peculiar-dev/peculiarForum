@@ -34,6 +34,7 @@ func (userHandler *UserHandler) IndexHandler(w http.ResponseWriter, r *http.Requ
 	themes := getThemes()
 	indexData := UserIndexData{currentUser, themes}
 
+	log.Println("User has name:" + currentUser.Username)
 	log.Println("User has theme:" + currentUser.Theme)
 
 	//tmpl := template.Must(template.ParseFiles("templates/header.html", "templates/index.html"))

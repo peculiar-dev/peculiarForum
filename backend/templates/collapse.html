@@ -44,10 +44,11 @@
 
             <div class="item-box">
                 <div class="comment">
+                    <span><img class="user-icon" src="{{(printf "/downloads/%s/_user_icon.png" .User)}}" >  {{.User}} posted:<br> </span>
                     <span class="title-text"><pre>{{.Message}}</pre></span>
                     <br>
                     {{if .Picture}}
-                        <img src="{{(printf "/downloads/%s" .Picture)}}"  width="400" height="auto">
+                        <img class="post-pic" src="{{(printf "/downloads/%s" .Picture)}}" >
                     {{end}}
                 </div>
                 

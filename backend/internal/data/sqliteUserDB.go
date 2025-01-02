@@ -2,6 +2,8 @@ package data
 
 import (
 	"database/sql"
+	"fmt"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -81,7 +83,37 @@ func (db *SqliteUserDB) CreateUserTable() {
 	log.Println("user table created")
 }
 
+// probably move to a fileUtil package if I need it twice.
+func copy(src, dst string) (int64, error) {
+	sourceFileStat, err := os.Stat(src)
+	if err != nil {
+		return 0, err
+	}
+
+	if !sourceFileStat.Mode().IsRegular() {
+		return 0, fmt.Errorf("%s is not a regular file", src)
+	}
+
+	source, err := os.Open(src)
+	if err != nil {
+		return 0, err
+	}
+	defer source.Close()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+		return 0, err
+	}
+	defer destination.Close()
+	nBytes, err := io.Copy(destination, source)
+	return nBytes, err
+}
+
 func (db *SqliteUserDB) InsertUser(user *User) {
+	/*
+		Insert new user into database, give it a default theme (light), and set up default user download directory
+		and default user images.
+	*/
 	currentTime := time.Now()
 
 	log.Println("Inserting user record ...")
@@ -91,10 +123,34 @@ func (db *SqliteUserDB) InsertUser(user *User) {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	_, err = statement.Exec(user.Username, currentTime, currentTime, user.Theme)
+	_, err = statement.Exec(user.Username, currentTime, currentTime, "light")
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
+
+	dirPath := "./downloads/" + user.Username
+
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		// Create the directory with 0755 permissions
+		err := os.MkdirAll(dirPath, 0755)
+		if err != nil {
+			//panic(err)
+			log.Println("Error creating file directory:", err)
+		}
+		println("Directory created successfully.")
+	} else if err != nil {
+		panic(err)
+	} else {
+		println("Directory already exists.")
+	}
+
+	_, err = copy("./static/themes/light/_user_icon.png", "./downloads/"+user.Username+"/_user_icon.png")
+	if err != nil {
+		log.Println("Error copying file:", err)
+	} else {
+		log.Println("File copied successfully.")
+	}
+
 }
 
 func (db *SqliteUserDB) UpdateUser(user *User) {
@@ -115,7 +171,7 @@ func (db *SqliteUserDB) UpdateUser(user *User) {
 
 func (db *SqliteUserDB) LoadTestUsers() {
 
-	db.InsertUser(&User{Username: "test", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
+	//db.InsertUser(&User{Username: "test", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
 	db.InsertUser(&User{Username: "test2", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
 	db.InsertUser(&User{Username: "test3", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
 	db.InsertUser(&User{Username: "test4", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
@@ -140,7 +196,7 @@ func (db *SqliteUserDB) GetUsers() *[]User {
 	defer rows.Close()
 	log.Println("get Users:")
 	for rows.Next() {
-		rows.Scan(&username, &created, &lastLogin)
+		rows.Scan(&username, &created, &lastLogin, &theme)
 		log.Println("Username: ", username)
 
 		users = append(users, User{Username: username, Created: created, LastLogin: lastLogin, Theme: theme})
