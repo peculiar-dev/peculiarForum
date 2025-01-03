@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<script 
+    src="https://unpkg.com/htmx.org@2.0.2" 
+    integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" 
+    crossorigin="anonymous">
+</script>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -21,4 +26,20 @@
         </select>
         <input value="Submit" type="submit" > 
     </form>
+
+    {{block "icon-element" .}} 
+    <div id="icon-target">
+    <span><img class="user-icon" id="icon-img" src="{{(printf "/downloads/%s/_user_icon.png" .User.Username )}}" > <br> </span>
+    <button class="pic-button" data-pic-target="userIcon">Update User Icon</button>
+    <form style="display: none;" class="form-horizontal" id="userIcon" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#icon-target" hx-post="/userIconUpload" >    
+        <div class="input-group">
+            <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitForm('userIcon',event)"> 
+            <button type="submit" style="display: none;">Upload</button>
+        </div>
+    </form>
+    </div>
+    {{end}}
+    <script src="/static/user.js"></script>
 </body>
+
+

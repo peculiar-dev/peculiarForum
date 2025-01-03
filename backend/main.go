@@ -124,6 +124,7 @@ func main() {
 
 	http.HandleFunc("/user", userHandler.IndexHandler)
 	http.HandleFunc("/userUpdate", userHandler.UpdateHandler)
+	http.HandleFunc("/userIconUpload", userHandler.UploadHandler)
 
 	log.Println("Starting server on port: " + port)
 
