@@ -12,6 +12,7 @@ type Commentdb interface {
 	LoadTestComments()
 	GetRootMail(username string) *[]Comment
 	GetRootComments(username string) *[]Comment
+	GetCommentsFromTo(username string, startIdx, endIdx int) *[]Comment
 	GetMailComments(parentID string, username string) *[]Comment
 	GetChildComments(parentID string, username string) *[]Comment
 	CreateCommentTable()

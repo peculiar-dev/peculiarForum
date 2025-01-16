@@ -58,7 +58,8 @@
 <!-- Recursive List Template Definition -->
 {{define "list"}} 
     <ul id="comment-list" style="list-style-type:none; padding-left: 0;">
-    {{range .}} 
+    {{block "comment-list-item" .}} 
+    {{range .Comments}} 
         <li>
             
             <!--{{ $itemId := (printf "item-%d" .Id) }} --><!-- Unique ID for each item -->
@@ -124,6 +125,8 @@
                 </form>
             </div>
         </li>
-    {{end}} 
+    {{end}}
+    <button hx-get="/{{.Page}}/" hx-swap="outerHTML" >MORE</button> 
+    {{end}}
     </ul>
 {{end}} 

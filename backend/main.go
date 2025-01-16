@@ -84,7 +84,7 @@ func main() {
 		Addr: port,
 	}
 
-	indexhandler := handlers.NewIndexHandler(commentsdb, userdb)
+	indexhandler := handlers.NewIndexHandler(commentsdb, userdb, 10)
 	mailhandler := handlers.NewMailHandler(commentsdb, userdb)
 	commentHandler := handlers.NewCommentHandler(commentsdb, notificationdb)
 	notificationHandler := handlers.NewNotificationHandler(notificationdb)
@@ -97,6 +97,7 @@ func main() {
 	//comment index
 
 	http.HandleFunc("/", indexhandler.IndexHandler)
+	http.HandleFunc("/{page}/", indexhandler.IndexPageHandler)
 	http.HandleFunc("/indexAddComment", indexhandler.AddHandler)
 	http.HandleFunc("/indexEditComment", indexhandler.EditHandler)
 	http.HandleFunc("/indexUpload", indexhandler.UploadHandler)

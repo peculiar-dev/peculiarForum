@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
@@ -77,6 +78,22 @@ func (db *SqliteCommentDB) LoadTestComments() {
 	db.InsertComment("id-7", "id-5", "test2", "test message 7", "id-5", false, false)
 	db.InsertComment("id-8", "", "test", "test mail message 1", "test2-test", true, false)
 	db.InsertComment("id-9", "", "test2", "test mail message 2", "test-test2", true, false)
+	db.InsertComment("id-10", "", "test", "test message 10", "root", true, false)
+	db.InsertComment("id-11", "", "test", "test message 11", "root", true, false)
+	db.InsertComment("id-12", "", "test", "test message 12", "root", true, false)
+	db.InsertComment("id-13", "", "test", "test message 13", "root", true, false)
+	db.InsertComment("id-14", "", "test", "test message 14", "root", true, false)
+	db.InsertComment("id-15", "", "test", "test message 15", "root", true, false)
+	db.InsertComment("id-16", "", "test", "test message 16", "root", true, false)
+	db.InsertComment("id-17", "", "test", "test message 17", "root", true, false)
+	db.InsertComment("id-18", "", "test", "test message 18", "root", true, false)
+	db.InsertComment("id-19", "", "test", "test message 19", "root", true, false)
+	db.InsertComment("id-20", "", "test", "test message 20", "root", true, false)
+	db.InsertComment("id-21", "", "test", "test message 21", "root", true, false)
+	db.InsertComment("id-22", "", "test", "test message 22", "root", true, false)
+	db.InsertComment("id-23", "", "test", "test message 23", "root", true, false)
+	db.InsertComment("id-24", "", "test", "test message 24", "root", true, false)
+	db.InsertComment("id-25", "", "test", "test message 25", "root", true, false)
 
 	//test child comment logic.
 	db.GetChildComments("id-1", "test")
@@ -144,6 +161,51 @@ func (db *SqliteCommentDB) GetRootComments(username string) *[]Comment {
 		log.Println("Comment ID:", id, " Message:", message, "Parent", parent)
 		editable = (username == user)
 		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+	}
+
+	return &comments
+
+}
+
+// get comments from startIdx to endIdx, inclusive.
+func (db *SqliteCommentDB) GetCommentsFromTo(username string, startIdx, endIdx int) *[]Comment {
+	var comments []Comment
+
+	var id string
+	var user string
+	var message string
+	var picture string
+	var parent string
+	var root bool
+	var sticky bool
+	var editable bool
+	var created time.Time
+
+	top := endIdx + 1
+
+	//rows, err := db.Query("SELECT * FROM comment where parent = 'root' ")
+	rows, err := db.database.Query(`SELECT id, user, message, picture, parent, root, sticky, created_at
+    					   FROM comment
+    					   WHERE root = 1 and parent = 'root'
+						   ORDER BY created_at DESC
+						   LIMIT ?;`, strconv.Itoa(top))
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	log.Println("root comments:")
+
+	var row int = 0
+
+	for rows.Next() {
+		if row >= startIdx && row <= endIdx {
+			rows.Scan(&id, &user, &message, &picture, &parent, &root, &sticky, &created)
+			log.Println("Comment ID:", id, " Message:", message, "Parent", parent)
+			editable = (username == user)
+			comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+		}
+		row++
 	}
 
 	return &comments

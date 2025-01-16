@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"peculiarity/internal/data"
+	"strconv"
 
 	"github.com/google/uuid"
 )
@@ -15,10 +16,17 @@ import (
 type IndexHandler struct {
 	comments data.Commentdb
 	users    data.Userdb
+	pageSize int
 }
 
-func NewIndexHandler(commentdb data.Commentdb, userdb data.Userdb) *IndexHandler {
-	return &IndexHandler{comments: commentdb, users: userdb}
+type IndexData struct {
+	Comments *[]data.Comment
+	User     *data.User
+	Page     int
+}
+
+func NewIndexHandler(commentdb data.Commentdb, userdb data.Userdb, pageSize int) *IndexHandler {
+	return &IndexHandler{comments: commentdb, users: userdb, pageSize: pageSize}
 }
 
 func (index *IndexHandler) IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -35,7 +43,11 @@ func (index *IndexHandler) IndexHandler(w http.ResponseWriter, r *http.Request) 
 	}
 
 	log.Println("In index, user:", username)
-	currentComments := index.comments.GetRootComments(username)
+
+	//currentComments := index.comments.GetRootComments(username)
+	currentComments := index.comments.GetCommentsFromTo(username, 0, index.pageSize-1)
+
+	data := IndexData{Comments: currentComments, Page: 1}
 
 	//tmpl := template.Must(template.ParseFiles("templates/header.html", "templates/index.html"))
 	//tmpl.ExecuteTemplate(w, "index", currentComments)
@@ -44,12 +56,40 @@ func (index *IndexHandler) IndexHandler(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = tmpl.ExecuteTemplate(w, "index.html", currentComments)
+	err = tmpl.ExecuteTemplate(w, "index.html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	//tmpl.Execute(w, currentComments)
 
+}
+
+func (index *IndexHandler) IndexPageHandler(w http.ResponseWriter, r *http.Request) {
+
+	//page := r.PathValue("page")
+	username := r.Header.Get("X-User")
+
+	if username == "" {
+		username = "test"
+	}
+
+	page, err := strconv.Atoi(r.PathValue("page"))
+	if err != nil {
+		log.Println("Error, invalid page in IndexPageHandler.")
+	}
+
+	start := (page * index.pageSize)
+	end := start + index.pageSize - 1
+
+	currentComments := index.comments.GetCommentsFromTo(username, start, end)
+
+	data := IndexData{Comments: currentComments, Page: page + 1}
+
+	log.Println("In page index, user:", username, " page:", page)
+	//currentComments := index.comments.GetRootComments(username)
+
+	tmpl := template.Must(template.ParseFiles("templates/index.html"))
+	tmpl.ExecuteTemplate(w, "comment-list-item", data)
 }
 
 func (index *IndexHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
