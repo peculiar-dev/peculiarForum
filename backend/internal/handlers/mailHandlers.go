@@ -20,6 +20,7 @@ type MailHandler struct {
 type MailIndexData struct {
 	Comments *[]data.Comment
 	Users    *[]data.User
+	User     *data.User
 }
 
 func NewMailHandler(commentdb data.Commentdb, userdb data.Userdb) *MailHandler {
@@ -38,6 +39,7 @@ func (mail *MailHandler) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	var indexData MailIndexData
 	indexData.Comments = mail.comments.GetRootMail(username)
 	indexData.Users = mail.users.GetUsers()
+	indexData.User = mail.users.GetUser(username)
 
 	tmpl, err := template.ParseFiles("templates/header.html", "templates/mailIndex.html")
 	if err != nil {
@@ -66,6 +68,7 @@ func (mail *MailHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	if username == "" {
 		username = "test"
 	}
+
 	//root := r.FormValue("root") // make boolean?
 	//sticky := r.FormValue("sticky") // make boolean?
 
@@ -79,12 +82,18 @@ func (mail *MailHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	//mail.comments.InsertComment(id, username, message, username+"-"+recipient, bRoot, bSticky)
 
 	log.Println("printing mail comments from:", r.FormValue("root"))
-	currentComments := mail.comments.GetMailComments(r.FormValue("root"), username)
+
+	//currentComments := mail.comments.GetMailComments(r.FormValue("root"), username)
+	var indexData MailIndexData
+	indexData.Comments = mail.comments.GetMailComments(r.FormValue("root"), username)
+	//indexData.Users = mail.users.GetUsers()
+	//indexData.User = mail.users.GetUser(username)
+
 	log.Println("message:", r.FormValue("comment"))
 
 	tpl := template.Must(template.ParseFiles("templates/mail.html"))
 
-	tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	tpl.ExecuteTemplate(w, "comment-list-element", indexData)
 }
 
 func (mail *MailHandler) IndexAddHandler(w http.ResponseWriter, r *http.Request) {
@@ -161,10 +170,14 @@ func (mail *MailHandler) IDHandler(w http.ResponseWriter, r *http.Request) {
 	//currentComments := getChildComments(database, parent)
 
 	//test child comment logic.
-	currentComments := mail.comments.GetMailComments(parent, username)
+	//currentComments := mail.comments.GetMailComments(parent, username)
+
+	var indexData MailIndexData
+	indexData.Comments = mail.comments.GetMailComments(parent, username)
+	indexData.User = mail.users.GetUser(username)
 
 	tmpl := template.Must(template.ParseFiles("templates/mail.html"))
-	tmpl.Execute(w, currentComments)
+	tmpl.Execute(w, indexData)
 
 }
 
@@ -284,7 +297,11 @@ func (mail *MailHandler) UploadHandler(w http.ResponseWriter, r *http.Request) {
 	mail.comments.EditCommentPic(id, username+"/"+filename)
 
 	currentComments := mail.comments.GetMailComments(root, username)
+
+	var indexData MailIndexData
+	indexData.Comments = currentComments
+
 	tmpl := template.Must(template.ParseFiles("templates/mail.html"))
-	tmpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	tmpl.ExecuteTemplate(w, "comment-list-element", indexData)
 
 }

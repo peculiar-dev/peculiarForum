@@ -9,10 +9,16 @@ import (
 
 type NotificationHandler struct {
 	notifications data.Notificationdb
+	users         data.Userdb
 }
 
-func NewNotificationHandler(notificationdb data.Notificationdb) *NotificationHandler {
-	return &NotificationHandler{notifications: notificationdb}
+type NotificationIndexData struct {
+	Notifications *[]data.Notification
+	User          *data.User
+}
+
+func NewNotificationHandler(notificationdb data.Notificationdb, userdb data.Userdb) *NotificationHandler {
+	return &NotificationHandler{notifications: notificationdb, users: userdb}
 }
 
 func (notification *NotificationHandler) IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,7 +31,10 @@ func (notification *NotificationHandler) IndexHandler(w http.ResponseWriter, r *
 	}
 
 	log.Println("In notifications, user:", username)
-	currentNotifications := notification.notifications.GetNotifications(username)
+	var data NotificationIndexData
+	data.Notifications = notification.notifications.GetNotifications(username)
+	data.User = notification.users.GetUser(username)
+	//currentNotifications := notification.notifications.GetNotifications(username)
 
 	//tmpl := template.Must(template.ParseFiles("templates/header.html", "templates/index.html"))
 	//tmpl.ExecuteTemplate(w, "index", currentComments)
@@ -34,7 +43,7 @@ func (notification *NotificationHandler) IndexHandler(w http.ResponseWriter, r *
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	err = tmpl.ExecuteTemplate(w, "notification.html", currentNotifications)
+	err = tmpl.ExecuteTemplate(w, "notification.html", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

@@ -40,6 +40,7 @@ func (index *IndexHandler) IndexHandler(w http.ResponseWriter, r *http.Request) 
 	if currentUser.Username == "" {
 		log.Println("User not found, calling userInit()")
 		index.users.InsertUser(&data.User{Username: username})
+		currentUser = index.users.GetUser(username)
 	}
 
 	log.Println("In index, user:", username)
@@ -47,7 +48,7 @@ func (index *IndexHandler) IndexHandler(w http.ResponseWriter, r *http.Request) 
 	//currentComments := index.comments.GetRootComments(username)
 	currentComments := index.comments.GetCommentsFromTo(username, 0, index.pageSize-1)
 
-	data := IndexData{Comments: currentComments, Page: 1}
+	data := IndexData{Comments: currentComments, User: currentUser, Page: 1}
 
 	//tmpl := template.Must(template.ParseFiles("templates/header.html", "templates/index.html"))
 	//tmpl.ExecuteTemplate(w, "index", currentComments)
@@ -112,8 +113,12 @@ func (index *IndexHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("In add index, user:", username)
 	currentComments := index.comments.GetRootComments(username)
 
+	//currentComments := index.comments.GetCommentsFromTo(username, start, end)
+
+	data := IndexData{Comments: currentComments}
+
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
-	tmpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	tmpl.ExecuteTemplate(w, "comment-list-element", data)
 }
 
 func (index *IndexHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
@@ -142,8 +147,10 @@ func (index *IndexHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("In edit index, user:", username)
 	currentComments := index.comments.GetRootComments(username)
 
+	data := IndexData{Comments: currentComments}
+
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
-	tmpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	tmpl.ExecuteTemplate(w, "comment-list-element", data)
 }
 
 func (index *IndexHandler) UploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -262,7 +269,10 @@ func (index *IndexHandler) UploadHandler(w http.ResponseWriter, r *http.Request)
 	index.comments.EditCommentPic(id, username+"/"+filename)
 
 	currentComments := index.comments.GetRootComments(username)
+
+	data := IndexData{Comments: currentComments}
+
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
-	tmpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	tmpl.ExecuteTemplate(w, "comment-list-element", data)
 
 }

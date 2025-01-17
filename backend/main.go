@@ -86,8 +86,8 @@ func main() {
 
 	indexhandler := handlers.NewIndexHandler(commentsdb, userdb, 10)
 	mailhandler := handlers.NewMailHandler(commentsdb, userdb)
-	commentHandler := handlers.NewCommentHandler(commentsdb, notificationdb)
-	notificationHandler := handlers.NewNotificationHandler(notificationdb)
+	commentHandler := handlers.NewCommentHandler(commentsdb, notificationdb, userdb)
+	notificationHandler := handlers.NewNotificationHandler(notificationdb, userdb)
 	userHandler := handlers.NewUserHandler(userdb)
 
 	http.Handle("/downloads/", http.StripPrefix("/downloads/", http.FileServer(http.Dir("./downloads"))))

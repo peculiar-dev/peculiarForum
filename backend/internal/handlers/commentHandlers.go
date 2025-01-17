@@ -16,10 +16,16 @@ import (
 type CommentHandler struct {
 	comments      data.Commentdb
 	notifications data.Notificationdb
+	users         data.Userdb
 }
 
-func NewCommentHandler(commentdb data.Commentdb, notificationdb data.Notificationdb) *CommentHandler {
-	return &CommentHandler{comments: commentdb, notifications: notificationdb}
+type CommentsData struct {
+	Comments *[]data.Comment
+	User     *data.User
+}
+
+func NewCommentHandler(commentdb data.Commentdb, notificationdb data.Notificationdb, userdb data.Userdb) *CommentHandler {
+	return &CommentHandler{comments: commentdb, notifications: notificationdb, users: userdb}
 }
 
 func (ch *CommentHandler) IDHandler(w http.ResponseWriter, r *http.Request) {
@@ -36,10 +42,14 @@ func (ch *CommentHandler) IDHandler(w http.ResponseWriter, r *http.Request) {
 	//currentComments := getChildComments(database, parent)
 
 	//test child comment logic.
-	currentComments := ch.comments.GetChildComments(parent, username)
+	//currentComments := ch.comments.GetChildComments(parent, username)
+
+	var data CommentsData
+	data.Comments = ch.comments.GetChildComments(parent, username)
+	data.User = ch.users.GetUser(username)
 
 	tmpl := template.Must(template.ParseFiles("templates/collapse.html"))
-	tmpl.Execute(w, currentComments)
+	tmpl.Execute(w, data)
 
 }
 
@@ -79,11 +89,14 @@ func (ch *CommentHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("printing comments from:", r.FormValue("root"))
 	currentComments := ch.comments.GetChildComments(r.FormValue("root"), username)
 
+	var data CommentsData
+	data.Comments = currentComments
+
 	//PrintComments(currentComments, "")
 
 	tpl := template.Must(template.ParseFiles("templates/collapse.html"))
 
-	tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	tpl.ExecuteTemplate(w, "comment-list-element", data)
 }
 
 func (ch *CommentHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
@@ -117,11 +130,14 @@ func (ch *CommentHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("printing comments from:", r.FormValue("root"))
 	currentComments := ch.comments.GetChildComments(r.FormValue("root"), username)
 
+	var data CommentsData
+	data.Comments = currentComments
+
 	// PrintComments(currentComments, "")
 
 	tpl := template.Must(template.ParseFiles("templates/collapse.html"))
 
-	tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	tpl.ExecuteTemplate(w, "comment-list-element", data)
 }
 
 func (ch *CommentHandler) UploadHandler(w http.ResponseWriter, r *http.Request) {
@@ -240,7 +256,11 @@ func (ch *CommentHandler) UploadHandler(w http.ResponseWriter, r *http.Request) 
 	ch.comments.EditCommentPic(id, username+"/"+filename)
 
 	currentComments := ch.comments.GetChildComments(root, username)
+
+	var data CommentsData
+	data.Comments = currentComments
+
 	tpl := template.Must(template.ParseFiles("templates/collapse.html"))
-	tpl.ExecuteTemplate(w, "comment-list-element", currentComments)
+	tpl.ExecuteTemplate(w, "comment-list-element", data)
 
 }
