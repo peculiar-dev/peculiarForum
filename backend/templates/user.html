@@ -33,10 +33,43 @@
     <button class="pic-button" data-pic-target="userIcon">Update User Icon</button>
     <form style="display: none;" class="form-horizontal" id="userIcon" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#icon-target" hx-post="/userIconUpload" >    
         <div class="input-group">
-            <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitForm('userIcon',event)"> 
+            <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitIconForm('userIcon',event)"> 
             <button type="submit" style="display: none;">Upload</button>
         </div>
     </form>
+    </div>
+    {{end}}
+    <br>
+    {{block "file-element" .}}
+    <div id="files-target">
+    <button class="files-button" data-files-target="userFiles">Upload To Server</button>
+    <form style="display: none;" class="form-horizontal" id="userFiles" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#files-target" hx-post="/userFileUpload" >    
+        <div class="input-group">
+            <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitFilesForm('userFiles',event)"> 
+            <button type="submit" style="display: none;">Upload</button>
+        </div>
+    </form>
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Size</th>
+                <th>Date</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{ $username := .User.Username }}
+            {{range .Files}}
+            <tr class="active">
+                <td><a href="{{(printf "/downloads/user/%s/%s" $username .Name )}}"><b>{{.Name }}</b> </a></td>
+                <td>{{.Size}}</td>
+                <td>{{.ModTime}}</td>
+                <td><button hx-get="/userFileDelete/{{.Name}}/" hx-swap="innerHTML" hx-target="#files-target" >DELETE</button></td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
     </div>
     {{end}}
     <script src="/static/user.js"></script>

@@ -18,6 +18,15 @@ function init(){
             picBox.myfiles.click();
         });
     });
+
+    // JavaScript to handle files button actions
+    document.querySelectorAll('.files-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const filesBoxId = this.getAttribute('data-files-target');
+            const filesBox = document.getElementById(filesBoxId);
+            filesBox.myfiles.click();
+        });
+    });
 }   
  
 // Used for creating a new FileList in a round-about way
@@ -29,7 +38,7 @@ function FileListItem(a) {
     return b.files
 }
 
-async function autoSubmitForm(formID,event) {
+async function autoSubmitIconForm(formID,event) {
     var form = document.getElementById(formID)
     if (form) {
         // Trigger the HTMX post
@@ -91,6 +100,25 @@ async function autoSubmitForm(formID,event) {
         htmx.trigger(form, 'submit');
         console.log("filename:" + file.name);
             console.log("fired submit to autosubmit icon update form.");
+    }
+        
+}
+
+async function autoSubmitFilesForm(formID,event) {
+    var form = document.getElementById(formID)
+    if (form) {
+        // Trigger the HTMX post
+        // after resizing the image. 
+            
+        const file = event.target.files[0];
+        if (!file) {
+            console.log("no file found");
+            return;
+        }
+        console.log("filename:" + file.name);
+        htmx.trigger(form, 'submit');
+        console.log("filename:" + file.name);
+            console.log("fired submit to autosubmit Files update form.");
     }
         
 }

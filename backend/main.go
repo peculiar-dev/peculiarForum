@@ -90,6 +90,7 @@ func main() {
 	notificationHandler := handlers.NewNotificationHandler(notificationdb, userdb)
 	userHandler := handlers.NewUserHandler(userdb)
 
+	http.Handle("/user/", http.StripPrefix("/user/", http.FileServer(http.Dir("./downloads/user"))))
 	http.Handle("/downloads/", http.StripPrefix("/downloads/", http.FileServer(http.Dir("./downloads"))))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	http.HandleFunc("/healthcheck", healthCheck)
@@ -125,7 +126,9 @@ func main() {
 
 	http.HandleFunc("/user", userHandler.IndexHandler)
 	http.HandleFunc("/userUpdate", userHandler.UpdateHandler)
-	http.HandleFunc("/userIconUpload", userHandler.UploadHandler)
+	http.HandleFunc("/userIconUpload", userHandler.UploadPhotoHandler)
+	http.HandleFunc("/userFileUpload", userHandler.UploadFileHandler)
+	http.HandleFunc("/userFileDelete/{filename}/", userHandler.FileDeleteHandler)
 
 	log.Println("Starting server on port: " + port)
 
