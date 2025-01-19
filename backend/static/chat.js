@@ -11,7 +11,8 @@ websocket.onmessage = function(evt) { onMessage(evt) };
 websocket.onerror = function(evt) { onError(evt) };
 
 function sendMessage() {
-    websocket.send(username + ": " + textField.value);
+    
+    websocket.send("<img class='user-icon' src='/downloads/"+username+"/_user_icon.png' >" +username + ": " + textField.value);
 }
 
 function onOpen() {
@@ -69,6 +70,9 @@ function proccessMessage(data){
 
 function writeToScreen(message) {
     output.innerHTML += message + "<br>";
+    window.location = '#chatContainer';
+    textField.value = "";
+    textField.focus();
 }
 
 

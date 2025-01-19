@@ -6,7 +6,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background-color: wheat;
+    background-color: #ccc;
 }
 
 header {
@@ -18,8 +18,8 @@ header {
 
 .button-row {
     display: flex;
-    justify-content: center;
-    gap: 30px;
+    justify-content: space-between;
+    gap: 10px;
     padding: 10px;
     background-color: #f4f4f4;
 }
@@ -36,6 +36,10 @@ header {
     text-align: center;
     text-decoration: none;
     display: inline-block;
+}
+
+.chatContainer {
+  height: 100%;
 }
 
 /*
@@ -145,7 +149,7 @@ a:link, a:visited {
     padding: 0 18px;
     display: none;
     overflow: hidden;
-    background-color: #f1f1f1;
+    
 }
 
 .reply-box {
@@ -272,4 +276,24 @@ li {
     margin: 5px 0; /* Spacing between list items */
     background-color: #f9f9f9; /* Background color for list items */
     border-radius: 5px; /* Rounded corners for list items */
+}
+
+pre {
+    white-space: pre-wrap;       /* Since CSS 2.1 */
+    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+    white-space: -pre-wrap;      /* Opera 4-6 */
+    white-space: -o-pre-wrap;    /* Opera 7 */
+    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+    white-space:pre-line;
+    line-height: 1; 
+}
+
+.user-icon{
+    width: 50px;
+    height: 50px;
+}
+
+.post-pic{
+    width:400px;
+    height: auto;
 }
