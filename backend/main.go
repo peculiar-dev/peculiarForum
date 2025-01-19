@@ -89,6 +89,7 @@ func main() {
 	commentHandler := handlers.NewCommentHandler(commentsdb, notificationdb, userdb)
 	notificationHandler := handlers.NewNotificationHandler(notificationdb, userdb)
 	userHandler := handlers.NewUserHandler(userdb)
+	chatHandler := handlers.NewChatHandler(userdb)
 
 	http.Handle("/user/", http.StripPrefix("/user/", http.FileServer(http.Dir("./downloads/user"))))
 	http.Handle("/downloads/", http.StripPrefix("/downloads/", http.FileServer(http.Dir("./downloads"))))
@@ -129,6 +130,10 @@ func main() {
 	http.HandleFunc("/userIconUpload", userHandler.UploadPhotoHandler)
 	http.HandleFunc("/userFileUpload", userHandler.UploadFileHandler)
 	http.HandleFunc("/userFileDelete/{filename}/", userHandler.FileDeleteHandler)
+
+	//chat
+	http.HandleFunc("/chat", chatHandler.ChatIndexHandler)
+	http.HandleFunc("/chatSocket", chatHandler.ChatSocket)
 
 	log.Println("Starting server on port: " + port)
 
