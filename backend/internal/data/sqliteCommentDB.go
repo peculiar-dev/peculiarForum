@@ -40,19 +40,20 @@ func NewSqliteCommentDB() *SqliteCommentDB {
 	return &SqliteCommentDB{}
 }
 
-func (db *SqliteCommentDB) InitDB() {
-	os.Remove("sqlite-database.db") // I delete the file to avoid duplicated records.
-	// SQLite is a file based database.
+func (db *SqliteCommentDB) InitDB(initialize, debug bool) {
+	if initialize {
+		os.Remove("sqlite-database.db") // I delete the file to avoid duplicated records.
+		// SQLite is a file based database.
 
-	log.Println("Creating sqlite-database.db...")
-	file, err := os.Create("sqlite-database.db") // Create SQLite file
-	if err != nil {
-		log.Fatal(err.Error())
+		log.Println("Creating sqlite-database.db...")
+		file, err := os.Create("sqlite-database.db") // Create SQLite file
+		if err != nil {
+			log.Fatal(err.Error())
+		}
+		file.Close()
+		log.Println("sqlite-database.db created")
 	}
-	file.Close()
-	log.Println("sqlite-database.db created")
-
-	sqliteDatabase, error := sql.Open("sqlite3", "./sqlite-database.db") // Open the created SQLite File
+	sqliteDatabase, error := sql.Open("sqlite3", "./sqlite-database.db") // Open the SQLite File
 	if error != nil {
 		log.Fatal(error.Error())
 	}
@@ -60,8 +61,12 @@ func (db *SqliteCommentDB) InitDB() {
 
 	db.database = sqliteDatabase
 
-	db.CreateCommentTable()
-	db.LoadTestComments()
+	if initialize {
+		db.CreateCommentTable()
+	}
+	if debug {
+		db.LoadTestComments()
+	}
 
 	// DISPLAY INSERTED RECORDS
 	//displayComments(sqliteDatabase, &comments)

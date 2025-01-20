@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"os"
 	"peculiarity/internal/data"
 	"peculiarity/internal/handlers"
 
@@ -38,7 +39,9 @@ var stopProcess chan bool
 //var comments []Comment
 
 var running bool = true
-var port string
+var port string = ":8080"
+var debug bool = false
+var initialize bool = false
 
 //var tpl *template.Template
 
@@ -52,23 +55,56 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 
 func init() {
 
-	port = ":8080"
+	// handle command-line arguments
+	if len(os.Args) > 1 {
+		for i, arg := range os.Args[1:] {
+			if arg == "-debug" {
+				debug = true
+				log.Println("setting debug mode true")
+			}
+			if arg == "-init" {
+				initialize = true
+				log.Println("setting init mode to true")
+			}
+			if arg == "-port" {
+				port = ":" + os.Args[i+2]
+				log.Println("setting port to:", port)
+			}
+			if arg == "-h" || arg == "-help" {
+				fmt.Println(" -h or -help         - This help message.")
+				fmt.Println(" -debug              - Sets debug mode to true, default false.")
+				fmt.Println(" -init               - Sets initalize mode to true, default false.")
+				fmt.Println(" -port <port number> - Sets the port number to <port number>, default: 8080")
+				os.Exit(0)
+			}
+
+		}
+	}
+
 	//tpl = template.Must(template.ParseGlob("templates/*"))
 
 	commentsdb = data.NewSqliteCommentDB()
-	commentsdb.InitDB()
+	commentsdb.InitDB(initialize, debug)
 
 	userdb = data.NewSqliteUserDB()
 	userdb.Setdb(commentsdb.Getdb()) // set the userdb to the same sqlite db instance
-	userdb.CreateUserTable()
-	userdb.LoadTestUsers()
-	log.Default().Println(userdb.GetUsers())
+	if initialize {
+		userdb.CreateUserTable()
+	}
+	if debug {
+		userdb.LoadTestUsers()
+		log.Default().Println(userdb.GetUsers())
+	}
 
 	notificationdb = data.NewSqliteNotificationDB()
 	notificationdb.Setdb(commentsdb.Getdb()) // set the notification db to the same sqline db instance
-	notificationdb.CreateNotificationTable()
-	notificationdb.LoadTestNotifications()
-	log.Default().Println(notificationdb.GetNotifications("test"))
+	if initialize {
+		notificationdb.CreateNotificationTable()
+	}
+	if debug {
+		notificationdb.LoadTestNotifications()
+		log.Default().Println(notificationdb.GetNotifications("test"))
+	}
 
 	uuidWithHyphen := uuid.New()
 	fmt.Println(uuidWithHyphen)

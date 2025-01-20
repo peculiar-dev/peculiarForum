@@ -8,7 +8,7 @@ import "database/sql"
 type Commentdb interface {
 	Getdb() *sql.DB
 	Setdb(*sql.DB)
-	InitDB()
+	InitDB(initialize, debug bool)
 	LoadTestComments()
 	GetRootMail(username string) *[]Comment
 	GetRootComments(username string) *[]Comment
