@@ -8,7 +8,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!--
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    -->
     <link rel="stylesheet" href="/static/themes/{{.User.Theme}}/index.css">
     <title>Collapsible Comment View</title>
 </head>
@@ -54,14 +56,12 @@
                 
 
                 <div class="button-group">
+                    <button class="reply-button" data-reply-target="{{ $replyBoxId }}">Reply</button>
                     {{if .Sublist}}
                         <!-- Show collapse/expand button only if there are sub-items -->
                         <button class="collapse-button" data-target="{{ $collapseContentId }}">+</button>
-                    {{end}}
-                    {{if not .Editable}}
-                        <!-- Reply button for all items -->
-                        <button class="reply-button" data-reply-target="{{ $replyBoxId }}">Reply</button>
-                    {{else}}
+                        {{end}}
+                    {{if.Editable}}
                         <!-- Edit button for all items -->
                         <button class="edit-button" data-edit-target="{{ $editBoxId }}">Edit</button>
                         <button class="pic-button" data-pic-target="{{ $picBoxId }}">Pic</button>
@@ -100,7 +100,7 @@
                     <input type = "hidden" name = "source" value = "comment" />
                        <!-- <input type="textarea" name="comment" id="comment" placeholder="Write your reply here..."> -->
                     <textarea name="comment" id="comment" rows="4" cols="50">{{.Message}}</textarea>
-                    <input value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 
+                    <input class="edit-submit-button" value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 
                 </form>
             </div>
 
@@ -116,7 +116,7 @@
                     <input type = "hidden" name = "source" value = "comment" />
                    <!-- <input type="textarea" name="comment" id="comment" placeholder="Write your reply here..."> -->
                     <textarea name="comment" id="comment" placeholder="Write your reply here..." rows="4" cols="50"></textarea>
-                    <input value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 
+                    <input class = "reply-button" value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 
                 </form>
             </div>
         </li>

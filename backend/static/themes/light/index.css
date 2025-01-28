@@ -1,5 +1,6 @@
 
 body {
+    width: fit-content;
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -18,8 +19,8 @@ header {
 
 .button-row {
     display: flex;
-    justify-content: space-between;
-    gap: 10px;
+    justify-content: center;
+    gap: 30px;
     padding: 10px;
     background-color: #f4f4f4;
 }
@@ -36,10 +37,6 @@ header {
     text-align: center;
     text-decoration: none;
     display: inline-block;
-}
-
-.chatContainer {
-  height: 100%;
 }
 
 /*
@@ -294,6 +291,6 @@ pre {
 }
 
 .post-pic{
-    width:400px;
+    width:390px;
     height: auto;
 }

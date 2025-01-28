@@ -1,6 +1,5 @@
 
 body {
-    width: fit-content;
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -19,13 +18,14 @@ header {
 
 .button-row {
     display: flex;
-    justify-content: center;
-    gap: 30px;
+    justify-content: space-between;
+    gap: 10px;
     padding: 10px;
     background-color: #f4f4f4;
 }
 
 .header-button {
+    /*content:url(/static/themes/light/_user_icon.png);*/
     cursor: pointer;
     background-color: #007BFF;
     color: white;
@@ -37,6 +37,48 @@ header {
     text-align: center;
     text-decoration: none;
     display: inline-block;
+
+}
+
+
+#home-button {
+    content:url(/static/themes/light/explorer.jpg);
+    height: 50px;
+    width: 50px;
+    background-color: #ffffff00;
+ }
+
+ #mail-button {
+    content:url(/static/themes/light/cube.jpg);
+    height: 50px;
+    width: 50px;
+    background-color: #ffffff00;
+ }
+
+ #notification-button {
+    content:url(/static/themes/light/glitch.jpg);
+    height: 50px;
+    width: 50px;
+    background-color: #ffffff00;
+ }
+
+ #chat-button {
+    content:url(/static/themes/light/error.jpg);
+    height: 50px;
+    width: 50px;
+    background-color: #ffffff00;
+ }
+
+ #user-button {
+    content:url(/static/themes/light/face.jpg);
+    height: 50px;
+    width: 50px;
+    background-color: #ffffff00;
+ }
+
+
+.chatContainer {
+  height: 100%;
 }
 
 /*

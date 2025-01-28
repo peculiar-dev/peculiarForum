@@ -103,7 +103,7 @@
                                 <input type = "hidden" name = "id" value ="{{.Id}}" />
                                 <!--  <input type = "hidden" name = "source" value = "index" /> -->
                                 <input type="file" name="myfiles" id="myfiles" class="form-input input-lg" onchange="autoSubmitForm('{{ $picBoxId }}',event)"> 
-                                <button type="submit" style="display: none;">Upload</button>
+                                <button id="upload-submit-button" type="submit" style="display: none;">Upload</button>
                                <!-- <button id="myfiles" type="file">Upload</button> -->
                             </div>
                         </form>
@@ -121,12 +121,12 @@
                     <input type = "hidden" name = "source" value = "index" />
                        <!-- <input type="textarea" name="comment" id="comment" placeholder="Write your reply here..."> -->
                     <textarea name="comment" id="comment" rows="4" cols="50">{{.Message}}</textarea>
-                    <input value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 
+                    <input class="edit-submit-button" value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 
                 </form>
             </div>
         </li>
     {{end}}
-    <button hx-get="/{{.Page}}/" hx-swap="outerHTML" >MORE</button> 
+    <a id="next-page-button" class="header-button" hx-get="/{{.Page}}/" hx-swap="outerHTML" >MORE</a> 
     {{end}}
     </ul>
 {{end}} 

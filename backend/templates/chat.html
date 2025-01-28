@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/themes/{{.User.Theme}}/index.css">
-    <title>Index</title>
+    <title>Chat</title>
 
     {{ template "header" . }}
 
@@ -19,9 +19,9 @@
         <tr>
             <td valign="bottom">
                 <div id="chatInput">
-                    <input id="textField" name="name" type="text">
+                    <input id="textField" class="chat-text-input" name="name" type="text">
                     <!--   <input onclick="join();" value="Join" type="button">  -->
-                       <input onclick="sendMessage();" value="Chat" type="button"> 
+                       <input id="chat-send-button" onclick="sendMessage();" value="Chat" type="button"> 
                 </div>
             </td>
         </tr>
