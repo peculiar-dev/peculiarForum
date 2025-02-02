@@ -11,6 +11,15 @@ function init(){
     }
 
     // JavaScript to handle pic button actions
+    document.querySelectorAll('.level-button').forEach(button => {
+        button.addEventListener('click', function() {
+            const levelBoxId = this.getAttribute('data-level-target');
+            const levelBox = document.getElementById(levelBoxId);
+            levelBox.levelsubmit.click();
+        });
+    });
+
+    // JavaScript to handle pic button actions
     document.querySelectorAll('.pic-button').forEach(button => {
         button.addEventListener('click', function() {
             const picBoxId = this.getAttribute('data-pic-target');

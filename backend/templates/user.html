@@ -15,17 +15,26 @@
 
 </head>
 <body>
-    {{ $theme := .User.Theme }}
-    <div class="instructions">Modify User Settings below:</div>
-    <form action="/userUpdate"> 
-        <label for="theme">Choose a Theme: </label>
-        <select id="theme" name="theme">
-            {{range .Themes}}
-            <option value="{{.}}" {{ if eq . $theme }}selected{{ end }}>{{.}} </option>
-            {{end}}
-        </select>
-        <input value="Submit" type="submit" > 
+    {{block "level-element" .}} 
+    {{if eq .User.Level 100}}
+    <div id="level-target">
+    <form action="/userLevelUpdate"></form>
+    <form class="form-horizontal" id="userLevel" hx-encoding="multipart/form-data" name = "levelForm" hx-swap="innerHTML" hx-target="#level-target" hx-post="/userLevelUpdate" >    
+    <label for="user">Choose a User and set level:  </label>
+    <select id="user" name="user" class="name-select">
+        {{range .Users}}
+        <option >{{.Username}} </option>
+        {{end}}
+    </select>
+    <input id="level" name="level" class="level-number-input" type="number">
+    <button id="levelsubmit" name="levelsubmit" type="submit" style="display: none;">Level</button>
     </form>
+    <button class="level-button" data-level-target="userLevel">Update User Level</button>
+    </div>
+    <br>
+    {{end}}
+    {{end}}
+
 
     {{block "icon-element" .}} 
     <div id="icon-target">
@@ -39,6 +48,25 @@
     </form>
     </div>
     {{end}}
+
+    <br>
+
+    {{ $theme := .User.Theme }}
+    <div class="instructions">Modify User Settings below:</div>
+    <form action="/userUpdate"> 
+        <label for="theme">Choose a Theme:  </label>
+        <select id="theme" name="theme">
+            {{range .Themes}}
+            <option value="{{.}}" {{ if eq . $theme }}selected{{ end }}>{{.}} </option>
+            {{end}}
+        </select>
+        <br>
+        <label for="email">Email for Notifications: </label>
+        <input id="email" class="email-text-input" name="email" type="text" value="{{.User.Email}}">
+        <br>
+        <input value="Submit" type="submit" > 
+    </form>
+
     <br>
     {{block "file-element" .}}
     <div id="files-target">

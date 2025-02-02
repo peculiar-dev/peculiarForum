@@ -163,6 +163,7 @@ func main() {
 
 	http.HandleFunc("/user", userHandler.IndexHandler)
 	http.HandleFunc("/userUpdate", userHandler.UpdateHandler)
+	http.HandleFunc("/userLevelUpdate", userHandler.UpdateLevelHandler)
 	http.HandleFunc("/userIconUpload", userHandler.UploadPhotoHandler)
 	http.HandleFunc("/userFileUpload", userHandler.UploadFileHandler)
 	http.HandleFunc("/userFileDelete/{filename}/", userHandler.FileDeleteHandler)

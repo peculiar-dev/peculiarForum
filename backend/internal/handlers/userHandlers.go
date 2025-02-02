@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"peculiarity/internal/data"
+	"strconv"
 )
 
 type UserHandler struct {
@@ -18,6 +19,7 @@ type UserIndexData struct {
 	User   *data.User
 	Themes *[]string
 	Files  []os.FileInfo
+	Users  *[]data.User
 }
 
 func NewUserHandler(userdb data.Userdb) *UserHandler {
@@ -26,6 +28,8 @@ func NewUserHandler(userdb data.Userdb) *UserHandler {
 
 func (userHandler *UserHandler) IndexHandler(w http.ResponseWriter, r *http.Request) {
 
+	var users *[]data.User
+
 	username := r.Header.Get("X-User")
 	if username == "" {
 		username = "test" // set a test user
@@ -33,10 +37,18 @@ func (userHandler *UserHandler) IndexHandler(w http.ResponseWriter, r *http.Requ
 	log.Println("In user settings, user:", username)
 
 	currentUser := userHandler.users.GetUser(username)
+
+	log.Println("user level:", currentUser.Level)
+
+	if currentUser.Level >= 100 {
+		log.Println("Getting users.")
+		users = userHandler.users.GetUsers()
+	}
+
 	//themes := []string{"dark", "light"}
 	themes := getThemes()
 	files := ListFile(username)
-	indexData := UserIndexData{currentUser, themes, files}
+	indexData := UserIndexData{currentUser, themes, files, users}
 
 	log.Println("User has name:" + currentUser.Username)
 	log.Println("User has theme:" + currentUser.Theme)
@@ -85,8 +97,11 @@ func getThemes() *[]string {
 
 func (userHandler *UserHandler) UpdateHandler(w http.ResponseWriter, r *http.Request) {
 
+	var users *[]data.User
+
 	username := r.Header.Get("X-User")
 	theme := r.FormValue("theme")
+	email := r.FormValue("email")
 
 	if username == "" {
 		username = "test"
@@ -94,7 +109,12 @@ func (userHandler *UserHandler) UpdateHandler(w http.ResponseWriter, r *http.Req
 
 	currentUser := userHandler.users.GetUser(username)
 
+	if currentUser.Level >= 100 {
+		users = userHandler.users.GetUsers()
+	}
+
 	currentUser.Theme = theme
+	currentUser.Email = email
 
 	userHandler.users.UpdateUser(currentUser)
 
@@ -102,7 +122,7 @@ func (userHandler *UserHandler) UpdateHandler(w http.ResponseWriter, r *http.Req
 
 	themes := getThemes()
 	files := ListFile(username)
-	indexData := UserIndexData{currentUser, themes, files}
+	indexData := UserIndexData{currentUser, themes, files, users}
 
 	log.Println("User has theme:" + currentUser.Theme)
 
@@ -122,7 +142,59 @@ func (userHandler *UserHandler) UpdateHandler(w http.ResponseWriter, r *http.Req
 	}
 }
 
+func (userHandler *UserHandler) UpdateLevelHandler(w http.ResponseWriter, r *http.Request) {
+
+	var users *[]data.User
+
+	username := r.Header.Get("X-User")
+	updateName := r.FormValue("user")
+	//level := r.FormValue("level")
+	level, err := strconv.Atoi(r.FormValue("level"))
+	if err != nil {
+		log.Println("Error, invalid level in UpdateHandler.")
+	}
+
+	if username == "" {
+		username = "test"
+	}
+
+	log.Println("In update user Level user:", username, " is updating:", updateName)
+
+	currentUser := userHandler.users.GetUser(username)
+
+	if currentUser.Level >= 100 {
+		users = userHandler.users.GetUsers()
+		updateUser := userHandler.users.GetUser(updateName)
+		updateUser.Level = level
+		log.Println("updating:", updateName, " level to:", level)
+		userHandler.users.UpdateUser(updateUser)
+		updateUser = userHandler.users.GetUser(updateName)
+		log.Println("user:", updateName, " level now set to:", updateUser.Level)
+	}
+
+	themes := getThemes()
+	files := ListFile(username)
+	indexData := UserIndexData{currentUser, themes, files, users}
+
+	//make sure the page shows new data, not cache
+	w.Header().Set("Cache-Control", "no-cache, no-store, must-revalidate") // HTTP 1.1.
+	w.Header().Set("Pragma", "no-cache")                                   // HTTP 1.0.
+	w.Header().Set("Expires", "0")                                         // Proxies.
+
+	tmpl, err := template.ParseFiles("templates/header.html", "templates/user.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = tmpl.ExecuteTemplate(w, "level-element", indexData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
 func (userHandler *UserHandler) UploadPhotoHandler(w http.ResponseWriter, r *http.Request) {
+
+	var users *[]data.User
 
 	username := ""
 	filename := "_user_icon.png"
@@ -223,7 +295,7 @@ func (userHandler *UserHandler) UploadPhotoHandler(w http.ResponseWriter, r *htt
 
 	themes := getThemes()
 	files := ListFile(username)
-	indexData := UserIndexData{currentUser, themes, files}
+	indexData := UserIndexData{currentUser, themes, files, users}
 
 	log.Println("User has theme:" + currentUser.Theme)
 
@@ -245,6 +317,8 @@ func (userHandler *UserHandler) UploadPhotoHandler(w http.ResponseWriter, r *htt
 }
 
 func (userHandler *UserHandler) UploadFileHandler(w http.ResponseWriter, r *http.Request) {
+
+	var users *[]data.User
 
 	username := ""
 	filename := ""
@@ -346,7 +420,7 @@ func (userHandler *UserHandler) UploadFileHandler(w http.ResponseWriter, r *http
 
 	themes := getThemes()
 	files := ListFile(username)
-	indexData := UserIndexData{currentUser, themes, files}
+	indexData := UserIndexData{currentUser, themes, files, users}
 
 	log.Println("User has theme:" + currentUser.Theme)
 

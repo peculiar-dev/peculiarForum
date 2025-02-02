@@ -16,6 +16,8 @@ type User struct {
 	Created   time.Time // Creation timestamp
 	LastLogin time.Time // Last Login timestamp
 	Theme     string    // user's current theme
+	Level     int       // user's admin level
+	Email     string    // user's email address
 
 }
 
@@ -57,13 +59,15 @@ func (db *SqliteUserDB) InitDB() {
 }
 
 func (db *SqliteUserDB) CreateUserTable() {
+
 	/*
-		This struct will be a row on a table.
 
 		Username  string    // Username of this user
 		Created   time.Time // Creation timestamp
 		LastLogin time.Time // Last Login timestamp
 		Theme     string    // user's current theme
+		Level     int       // user's admin level
+		Email     string    // user's email address
 
 	*/
 
@@ -71,7 +75,9 @@ func (db *SqliteUserDB) CreateUserTable() {
 	"username" TEXT,
 	"created_at" DATETIME,
 	"lastlogin_at" DATETIME,
-	"theme" TEXT
+	"theme" TEXT,
+	"level" int,
+	"email" TEXT
 	);`
 
 	log.Println("Create User table...")
@@ -81,6 +87,8 @@ func (db *SqliteUserDB) CreateUserTable() {
 	}
 	statement.Exec() // Execute SQL Statements
 	log.Println("user table created")
+	db.InsertUser(&User{Username: "admin", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 100, Email: ""})
+	log.Println("admin user created")
 }
 
 // probably move to a fileUtil package if I need it twice.
@@ -111,19 +119,29 @@ func copy(src, dst string) (int64, error) {
 
 func (db *SqliteUserDB) InsertUser(user *User) {
 	/*
+
+		Username  string    // Username of this user
+		Created   time.Time // Creation timestamp
+		LastLogin time.Time // Last Login timestamp
+		Theme     string    // user's current theme
+		Level     int       // user's admin level
+		Email     string    // user's email address
+
+	*/
+	/*
 		Insert new user into database, give it a default theme (light), and set up default user download directory
 		and default user images.
 	*/
 	currentTime := time.Now()
 
 	log.Println("Inserting user record ...")
-	insertUserSQL := `INSERT INTO user(username, created_at, lastlogin_at, theme) VALUES (?, ?, ?, ?)`
+	insertUserSQL := `INSERT INTO user(username, created_at, lastlogin_at, theme, level, email) VALUES (?, ?, ?, ?, ?, ?)`
 	statement, err := db.database.Prepare(insertUserSQL) // Prepare statement.
 	// This is good to avoid SQL injections
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	_, err = statement.Exec(user.Username, currentTime, currentTime, "light")
+	_, err = statement.Exec(user.Username, currentTime, currentTime, "light", user.Level, user.Email)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -154,16 +172,28 @@ func (db *SqliteUserDB) InsertUser(user *User) {
 }
 
 func (db *SqliteUserDB) UpdateUser(user *User) {
+
+	/*
+
+		Username  string    // Username of this user
+		Created   time.Time // Creation timestamp
+		LastLogin time.Time // Last Login timestamp
+		Theme     string    // user's current theme
+		Level     int       // user's admin level
+		Email     string    // user's email address
+
+	*/
+
 	currentTime := time.Now()
 
 	log.Println("Updating user record ...")
-	updateUserSQL := `UPDATE user SET theme = ?, lastlogin_at = ?  WHERE username = ?`
+	updateUserSQL := `UPDATE user SET theme = ?, lastlogin_at = ?, level = ?, email = ?  WHERE username = ?`
 	statement, err := db.database.Prepare(updateUserSQL) // Prepare statement.
 	// This is good to avoid SQL injections
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	_, err = statement.Exec(user.Theme, currentTime, user.Username)
+	_, err = statement.Exec(user.Theme, currentTime, user.Level, user.Email, user.Username)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -171,11 +201,11 @@ func (db *SqliteUserDB) UpdateUser(user *User) {
 
 func (db *SqliteUserDB) LoadTestUsers() {
 
-	//db.InsertUser(&User{Username: "test", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
-	db.InsertUser(&User{Username: "test2", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
-	db.InsertUser(&User{Username: "test3", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
-	db.InsertUser(&User{Username: "test4", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
-	db.InsertUser(&User{Username: "test5", Created: time.Now(), LastLogin: time.Now(), Theme: "light"})
+	db.InsertUser(&User{Username: "test", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 100, Email: ""})
+	db.InsertUser(&User{Username: "test2", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 0, Email: ""})
+	db.InsertUser(&User{Username: "test3", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 0, Email: ""})
+	db.InsertUser(&User{Username: "test4", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 0, Email: ""})
+	db.InsertUser(&User{Username: "test5", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 0, Email: ""})
 
 }
 
@@ -186,8 +216,10 @@ func (db *SqliteUserDB) GetUsers() *[]User {
 	var created time.Time
 	var lastLogin time.Time
 	var theme string
+	var level int
+	var email string
 
-	rows, err := db.database.Query(`SELECT username, created_at, lastlogin_at, theme
+	rows, err := db.database.Query(`SELECT username, created_at, lastlogin_at, theme, level, email
     					   FROM user
 						   ORDER BY username;`)
 	if err != nil {
@@ -196,10 +228,10 @@ func (db *SqliteUserDB) GetUsers() *[]User {
 	defer rows.Close()
 	log.Println("get Users:")
 	for rows.Next() {
-		rows.Scan(&username, &created, &lastLogin, &theme)
+		rows.Scan(&username, &created, &lastLogin, &theme, &level, &email)
 		log.Println("Username: ", username)
 
-		users = append(users, User{Username: username, Created: created, LastLogin: lastLogin, Theme: theme})
+		users = append(users, User{Username: username, Created: created, LastLogin: lastLogin, Theme: theme, Level: level, Email: email})
 	}
 
 	return &users
@@ -211,8 +243,10 @@ func (db *SqliteUserDB) GetUser(username string) *User {
 	var created time.Time
 	var lastLogin time.Time
 	var theme string
+	var level int
+	var email string
 
-	rows, err := db.database.Query(`SELECT username, created_at, lastlogin_at, theme
+	rows, err := db.database.Query(`SELECT username, created_at, lastlogin_at, theme, level, email
     					   FROM user
 						   Where username = ?
 						   ORDER BY username;`, username)
@@ -222,8 +256,8 @@ func (db *SqliteUserDB) GetUser(username string) *User {
 	defer rows.Close()
 	log.Println("got User:" + username)
 	for rows.Next() {
-		rows.Scan(&username, &created, &lastLogin, &theme)
-		user = User{Username: username, Created: created, LastLogin: lastLogin, Theme: theme}
+		rows.Scan(&username, &created, &lastLogin, &theme, &level, &email)
+		user = User{Username: username, Created: created, LastLogin: lastLogin, Theme: theme, Level: level, Email: email}
 	}
 
 	return &user
