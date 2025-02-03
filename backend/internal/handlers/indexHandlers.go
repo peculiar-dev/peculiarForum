@@ -9,6 +9,7 @@ import (
 	"os"
 	"peculiarity/internal/data"
 	"strconv"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -83,8 +84,9 @@ func (index *IndexHandler) IndexPageHandler(w http.ResponseWriter, r *http.Reque
 	end := start + index.pageSize - 1
 
 	currentComments := index.comments.GetCommentsFromTo(username, start, end)
+	currentUser := index.users.GetUser(username)
 
-	data := IndexData{Comments: currentComments, Page: page + 1}
+	data := IndexData{Comments: currentComments, Page: page + 1, User: currentUser}
 
 	log.Println("In page index, user:", username, " page:", page)
 	//currentComments := index.comments.GetRootComments(username)
@@ -114,8 +116,9 @@ func (index *IndexHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	currentComments := index.comments.GetRootComments(username)
 
 	//currentComments := index.comments.GetCommentsFromTo(username, start, end)
+	currentUser := index.users.GetUser(username)
 
-	data := IndexData{Comments: currentComments}
+	data := IndexData{Comments: currentComments, User: currentUser}
 
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
 	tmpl.ExecuteTemplate(w, "comment-list-element", data)
@@ -131,6 +134,9 @@ func (index *IndexHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 	parent := r.FormValue("parent")
 	id := r.FormValue("id")
 
+	log.Println("sticky:", r.FormValue("sticky"))
+	log.Println("id:", id)
+
 	if username == "" {
 		username = "test"
 	}
@@ -142,12 +148,35 @@ func (index *IndexHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("parent: %s\n", parent)
 	//fmt.Printf("comment:%v\n", comment)
-	index.comments.EditComment(id, message, parent, bRoot, bSticky)
+
+	currentUser := index.users.GetUser(username)
+	currentComment := index.comments.GetComment(id)
+	if currentUser.Level == 100 {
+		log.Println("User is Admin")
+		if r.FormValue("sticky") == "true" {
+			bSticky = true
+		}
+	} else {
+		bSticky = currentComment.Sticky
+	}
+
+	updateTime := currentComment.Created
+
+	// if current comment was not sticky, but is now sticky, add 30 days to now
+	if !currentComment.Sticky && bSticky {
+		updateTime = updateTime.Add(30 * 24 * time.Hour) // now + 30 days
+	}
+	// if current comment was sticky, but is now not sticky, subtract 30 days from now.
+	if currentComment.Sticky && !bSticky {
+		updateTime = updateTime.Add(-(30 * 24 * time.Hour)) // now - 30 days
+	}
+
+	index.comments.EditComment(id, message, parent, bRoot, bSticky, updateTime)
 
 	log.Println("In edit index, user:", username)
 	currentComments := index.comments.GetRootComments(username)
 
-	data := IndexData{Comments: currentComments}
+	data := IndexData{Comments: currentComments, User: currentUser}
 
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
 	tmpl.ExecuteTemplate(w, "comment-list-element", data)
@@ -268,9 +297,10 @@ func (index *IndexHandler) UploadHandler(w http.ResponseWriter, r *http.Request)
 	log.Println("uploading file from:", username, " adding to comment id:", id, " root Id:", root)
 	index.comments.EditCommentPic(id, username+"/"+filename)
 
+	currentUser := index.users.GetUser(username)
 	currentComments := index.comments.GetRootComments(username)
 
-	data := IndexData{Comments: currentComments}
+	data := IndexData{Comments: currentComments, User: currentUser}
 
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
 	tmpl.ExecuteTemplate(w, "comment-list-element", data)

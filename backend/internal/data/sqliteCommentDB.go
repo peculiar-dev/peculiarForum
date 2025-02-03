@@ -138,8 +138,38 @@ func (db *SqliteCommentDB) GetRootMail(username string) *[]Comment {
 
 }
 
+func (db *SqliteCommentDB) GetComment(id string) *Comment {
+	var comment Comment
+
+	var user string
+	var message string
+	var picture string
+	var parent string
+	var root bool
+	var sticky bool
+	var editable bool
+	var created time.Time
+	//rows, err := db.Query("SELECT * FROM comment where parent = 'root' ")
+	rows, err := db.database.Query(`SELECT id, user, message, picture, parent, root, sticky, created_at
+    					   FROM comment
+    					   WHERE id = ?;`, id)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+	log.Println("comment:")
+	for rows.Next() {
+		rows.Scan(&id, &user, &message, &picture, &parent, &root, &sticky, &created)
+		log.Println("Comment ID:", id, " Message:", message, "Parent", parent, "Sticky", sticky)
+		comment = Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created}
+	}
+	return &comment
+}
+
 func (db *SqliteCommentDB) GetRootComments(username string) *[]Comment {
 	var comments []Comment
+	//var stickyComments []Comment
 
 	var id string
 	var user string
@@ -163,10 +193,18 @@ func (db *SqliteCommentDB) GetRootComments(username string) *[]Comment {
 	log.Println("root comments:")
 	for rows.Next() {
 		rows.Scan(&id, &user, &message, &picture, &parent, &root, &sticky, &created)
-		log.Println("Comment ID:", id, " Message:", message, "Parent", parent)
+		log.Println("Comment ID:", id, " Message:", message, "Parent", parent, "Sticky", sticky)
 		editable = (username == user)
+		/*
+			if sticky {
+				stickyComments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+			} else {
+				comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+			}
+		*/
 		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
 	}
+	//comments = append(stickyComments, comments...)
 
 	return &comments
 
@@ -175,6 +213,7 @@ func (db *SqliteCommentDB) GetRootComments(username string) *[]Comment {
 // get comments from startIdx to endIdx, inclusive.
 func (db *SqliteCommentDB) GetCommentsFromTo(username string, startIdx, endIdx int) *[]Comment {
 	var comments []Comment
+	//var stickyComments []Comment
 
 	var id string
 	var user string
@@ -206,13 +245,21 @@ func (db *SqliteCommentDB) GetCommentsFromTo(username string, startIdx, endIdx i
 	for rows.Next() {
 		if row >= startIdx && row <= endIdx {
 			rows.Scan(&id, &user, &message, &picture, &parent, &root, &sticky, &created)
-			log.Println("Comment ID:", id, " Message:", message, "Parent", parent)
+			log.Println("Comment ID:", id, " Message:", message, "Parent", parent, "sticky:", sticky)
 			editable = (username == user)
+			/*
+				if sticky {
+					stickyComments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+				} else {
+					comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+				}
+			*/
 			comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
 		}
 		row++
 	}
 
+	//comments = append(stickyComments, comments...)
 	return &comments
 
 }
@@ -359,22 +406,21 @@ func (db *SqliteCommentDB) InsertComment(id, rootID, user, message, parent strin
 	}
 }
 
-func (db *SqliteCommentDB) EditComment(id, message, parent string, root bool, sticky bool) {
-	//currentTime := time.Now()
+func (db *SqliteCommentDB) EditComment(id, message, parent string, root bool, sticky bool, created time.Time) {
 
 	//message = strings.Replace(message, "\n", "<br>", -1)
 
 	log.Println("Editing comment record ...")
 	//insertCommentSQL := `INSERT INTO comment(id, user, message, parent,root,sticky,created_at) VALUES (?, ?, ?, ?, ?, ?,?)`
 
-	editCommentSQL := `UPDATE comment SET message = ? WHERE id =?`
+	editCommentSQL := `UPDATE comment SET message = ?, sticky = ?, created_at = ? WHERE id =?`
 	statement, err := db.database.Prepare(editCommentSQL) // Prepare statement.
 	// This is good to avoid SQL injections
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 	//_, err = statement.Exec(id, user, message, parent, root, sticky, currentTime)
-	_, err = statement.Exec(message, id)
+	_, err = statement.Exec(message, sticky, created, id)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

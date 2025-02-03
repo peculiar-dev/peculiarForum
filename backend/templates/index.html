@@ -120,7 +120,10 @@
                     <input type = "hidden" name = "id" value ="{{.Id}}" />
                     <input type = "hidden" name = "source" value = "index" />
                        <!-- <input type="textarea" name="comment" id="comment" placeholder="Write your reply here..."> -->
-                    <textarea name="comment" id="comment" rows="4" cols="50">{{.Message}}</textarea>
+                    <textarea name="comment" id="comment" rows="4" cols="40">{{.Message}}</textarea><br>
+                    {{if eq $.User.Level 100}}
+                    <input type="checkbox" id="sticky" name="sticky" value="true" {{if .Sticky}}checked{{end}}>sticky <br>
+                    {{end}}
                     <input class="edit-submit-button" value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 
                 </form>
             </div>

@@ -121,7 +121,7 @@ func (ch *CommentHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("parent: %s\n", parent)
 	//fmt.Printf("comment:%v\n", comment)
 
-	ch.comments.EditComment(id, message, parent, bRoot, bSticky)
+	ch.comments.EditComment(id, message, parent, bRoot, bSticky, ch.comments.GetComment(id).Created)
 	/*
 		AddCommentToSublist(&comments, parent, comment)
 		log.Println("added to sublist")
