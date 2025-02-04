@@ -105,6 +105,10 @@ func (index *IndexHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	message := r.FormValue("comment")
 	parent := "root"
 	bRoot = true
+	page, err := strconv.Atoi(r.FormValue("page"))
+	if err != nil {
+		log.Println("Error, invalid page in IndexPageHandler.")
+	}
 
 	if username == "" {
 		username = "test"
@@ -113,12 +117,16 @@ func (index *IndexHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	index.comments.InsertComment(id, "", username, message, parent, bRoot, bSticky)
 
 	log.Println("In add index, user:", username)
-	currentComments := index.comments.GetRootComments(username)
+	//currentComments := index.comments.GetRootComments(username)
+	start := 0
+	end := (page * index.pageSize) - 1
+
+	currentComments := index.comments.GetCommentsFromTo(username, start, end)
 
 	//currentComments := index.comments.GetCommentsFromTo(username, start, end)
 	currentUser := index.users.GetUser(username)
 
-	data := IndexData{Comments: currentComments, User: currentUser}
+	data := IndexData{Comments: currentComments, User: currentUser, Page: page}
 
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
 	tmpl.ExecuteTemplate(w, "comment-list-element", data)
@@ -133,9 +141,14 @@ func (index *IndexHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 	message := r.FormValue("comment")
 	parent := r.FormValue("parent")
 	id := r.FormValue("id")
+	page, err := strconv.Atoi(r.FormValue("page"))
+	if err != nil {
+		log.Println("Error, invalid page in IndexPageHandler.")
+	}
 
 	log.Println("sticky:", r.FormValue("sticky"))
 	log.Println("id:", id)
+	log.Println("page:", page)
 
 	if username == "" {
 		username = "test"
@@ -174,9 +187,13 @@ func (index *IndexHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 	index.comments.EditComment(id, message, parent, bRoot, bSticky, updateTime)
 
 	log.Println("In edit index, user:", username)
-	currentComments := index.comments.GetRootComments(username)
+	//currentComments := index.comments.GetRootComments(username)
+	start := 0
+	end := (page * index.pageSize) - 1
 
-	data := IndexData{Comments: currentComments, User: currentUser}
+	currentComments := index.comments.GetCommentsFromTo(username, start, end)
+
+	data := IndexData{Comments: currentComments, User: currentUser, Page: page}
 
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
 	tmpl.ExecuteTemplate(w, "comment-list-element", data)
@@ -188,6 +205,7 @@ func (index *IndexHandler) UploadHandler(w http.ResponseWriter, r *http.Request)
 	id := ""
 	root := ""
 	filename := ""
+	page := 0
 
 	// Ensure the request is a POST
 	if r.Method != http.MethodPost {
@@ -262,6 +280,20 @@ func (index *IndexHandler) UploadHandler(w http.ResponseWriter, r *http.Request)
 				log.Println("root field value:", string(data))
 				root = string(data)
 			}
+			if part.FormName() == "page" {
+				data, err := io.ReadAll(part)
+				if err != nil {
+					log.Println("error reading hidden field:", err.Error())
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+				log.Println("page field value:", string(data))
+				page, err = strconv.Atoi(string(data))
+				if err != nil {
+					log.Println("Error, invalid page in IndexPageHandler.")
+				}
+
+			}
 		}
 	}
 
@@ -298,9 +330,13 @@ func (index *IndexHandler) UploadHandler(w http.ResponseWriter, r *http.Request)
 	index.comments.EditCommentPic(id, username+"/"+filename)
 
 	currentUser := index.users.GetUser(username)
-	currentComments := index.comments.GetRootComments(username)
+	//currentComments := index.comments.GetRootComments(username)
+	start := 0
+	end := (page * index.pageSize) - 1
 
-	data := IndexData{Comments: currentComments, User: currentUser}
+	currentComments := index.comments.GetCommentsFromTo(username, start, end)
+
+	data := IndexData{Comments: currentComments, User: currentUser, Page: page}
 
 	tmpl := template.Must(template.ParseFiles("templates/index.html"))
 	tmpl.ExecuteTemplate(w, "comment-list-element", data)

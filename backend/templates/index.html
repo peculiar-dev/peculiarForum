@@ -39,6 +39,7 @@
                 <div class="instructions">Enter your post below:</div>
                 <form hx-swap="innerHTML" hx-target="#comment-list" hx-post="/indexAddComment"> 
                     <textarea name="comment" id="comment" placeholder="Write your comment here..." rows="4" cols="50"></textarea>
+                    <input type = "hidden" name = "page" value = "{{$.Page}}" />
                     <input value="Submit" type="submit" onclick='current_comment = "post-box";'> 
                 </form>
             </div>
@@ -101,6 +102,7 @@
                             <div class="input-group">
                                 <input type = "hidden" name = "root" class="root_input" value = "" />
                                 <input type = "hidden" name = "id" value ="{{.Id}}" />
+                                <input type = "hidden" name = "page" value = "{{$.Page}}" />
                                 <!--  <input type = "hidden" name = "source" value = "index" /> -->
                                 <input type="file" name="myfiles" id="myfiles" class="form-input input-lg" onchange="autoSubmitForm('{{ $picBoxId }}',event)"> 
                                 <button id="upload-submit-button" type="submit" style="display: none;">Upload</button>
@@ -119,6 +121,7 @@
                     <input type = "hidden" name = "root" class="root_input" value = "" />
                     <input type = "hidden" name = "id" value ="{{.Id}}" />
                     <input type = "hidden" name = "source" value = "index" />
+                    <input type = "hidden" name = "page" value = "{{$.Page}}" />
                        <!-- <input type="textarea" name="comment" id="comment" placeholder="Write your reply here..."> -->
                     <textarea name="comment" id="comment" rows="4" cols="40">{{.Message}}</textarea><br>
                     {{if eq $.User.Level 100}}
