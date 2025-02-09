@@ -12,7 +12,7 @@
 <body>
     <ul id="notification-list" style="list-style-type:none; padding-left: 0;">
     {{range .Notifications}} 
-    <li> <a class="notification-button" href={{.CommentLink}} >Mail</a> </li>    
+    <li> <a class="notification-button" href={{.CommentLink}} >{{.Sender }} replied ...</a> </li>    
 
     {{end}} 
     </ul>

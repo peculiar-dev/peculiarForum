@@ -79,6 +79,57 @@
         
     }
 
+    // post-button click function
+    function postClick(e){
+        const postBox = document.getElementById("post-box");
+       if (postBox.style.display === 'block') {
+            postBox.style.display = 'none';
+        } else {
+            postBox.style.display = 'block';
+        }
+    };
+
+    //collaps-button click function
+    function collapseClick(e){
+        const targetId = e.currentTarget.getAttribute('data-target');
+        const content = document.getElementById(targetId);
+        if (content.style.display === 'block') {
+            content.style.display = 'none';
+            e.currentTarget.innerHTML = '+';
+        } else {
+            content.style.display = 'block';
+            e.currentTarget.innerHTML = '-';
+        }
+    };
+
+    // reply button click function
+    function replyClick(e) {
+        const replyBoxId = e.currentTarget.getAttribute('data-reply-target');
+        const replyBox = document.getElementById(replyBoxId);
+        if (replyBox.style.display === 'block') {
+            replyBox.style.display = 'none';
+        } else {
+            replyBox.style.display = 'block';
+        }
+    };
+
+    // edit button click function
+    function editClick(e) {
+            const editBoxId = e.currentTarget.getAttribute('data-edit-target');
+            const editBox = document.getElementById(editBoxId);
+            if (editBox.style.display === 'block') {
+                editBox.style.display = 'none';
+            } else {
+                editBox.style.display = 'block';
+            }
+    };
+
+    // pic button click function
+    function picClick(e) {
+            const picBoxId = e.currentTarget.getAttribute('data-pic-target');
+            const picBox = document.getElementById(picBoxId);
+            picBox.myfiles.click();
+    };
 
     function init(){
         console.log("initialize");
@@ -91,67 +142,29 @@
             elements[i].value = current_root;
         }
 
-        // JavaScript to handle post button actions
-        document.querySelectorAll('.post-button').forEach(button => {
-            button.addEventListener('click', function() {
-                const postBox = document.getElementById("post-box");
-                if (postBox.style.display === 'block') {
-                    postBox.style.display = 'none';
-                } else {
-                    postBox.style.display = 'block';
-                }
-            });
-        });
+    // JavaScript to handle post button actions
+    document.querySelectorAll('.post-button').forEach(button => {
+        button.addEventListener('click', postClick)
+    });
 
     // JavaScript to handle collapsible actions
     document.querySelectorAll('.collapse-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const targetId = this.getAttribute('data-target');
-            const content = document.getElementById(targetId);
-            if (content.style.display === 'block') {
-                content.style.display = 'none';
-                this.innerHTML = '+';
-            } else {
-                content.style.display = 'block';
-                this.innerHTML = '-';
-            }
-        });
+        button.addEventListener('click', collapseClick)
     });
 
     // JavaScript to handle reply button actions
     document.querySelectorAll('.reply-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const replyBoxId = this.getAttribute('data-reply-target');
-            const replyBox = document.getElementById(replyBoxId);
-            if (replyBox.style.display === 'block') {
-                replyBox.style.display = 'none';
-            } else {
-                replyBox.style.display = 'block';
-            }
-        });
+        button.addEventListener('click', replyClick);
     });
 
     // JavaScript to handle edit button actions
     document.querySelectorAll('.edit-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const editBoxId = this.getAttribute('data-edit-target');
-            const editBox = document.getElementById(editBoxId);
-            if (editBox.style.display === 'block') {
-                editBox.style.display = 'none';
-            } else {
-                editBox.style.display = 'block';
-            }
-        });
+        button.addEventListener('click', editClick);
     });
-
 
     // JavaScript to handle pic button actions
     document.querySelectorAll('.pic-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const picBoxId = this.getAttribute('data-pic-target');
-            const picBox = document.getElementById(picBoxId);
-            picBox.myfiles.click();
-        });
+        button.addEventListener('click', picClick);
     });
 
     // Handle sending (example)
