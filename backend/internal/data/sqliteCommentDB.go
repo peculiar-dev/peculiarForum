@@ -309,6 +309,8 @@ func (db *SqliteCommentDB) GetMailComments(parentID string, username string) *[]
 func (db *SqliteCommentDB) GetChildComments(parentID string, username string) *[]Comment {
 	var comments []Comment
 
+	var rootComment Comment
+
 	var id string
 	var user string
 	var message string
@@ -343,13 +345,22 @@ func (db *SqliteCommentDB) GetChildComments(parentID string, username string) *[
 		rows.Scan(&id, &user, &message, &picture, &parent, &root, &sticky, &created)
 		editable = (username == user)
 		log.Println("Comment ID:", id, " Message:", message, " Parent", parent, " Editable:", editable)
-		if parent == parentID || root {
+		if parent == parentID {
+			log.Println("found parent comment")
 			comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+		} else if root {
+			log.Println("found root comment")
+			rootComment = Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created}
+
+			//comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+
 		} else {
 			log.Println("adding ", id, " to parent ", parent)
 			addCommentToSublist(&comments, parent, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
 		}
 	}
+
+	comments = append([]Comment{rootComment}, comments...)
 
 	return &comments
 

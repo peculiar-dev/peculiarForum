@@ -79,6 +79,11 @@ func (ch *CommentHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	ch.comments.InsertComment(id, r.FormValue("root"), username, message, parent, bRoot, bSticky)
 	/* db.InsertNotification(Notification{Sender: "test2", Reciever: "test", CommentLink: "/comment/id-1/id-2", Created: time.Now()})
 	 */
+
+	rootComment := ch.comments.GetComment(r.FormValue("root"))
+
+	ch.comments.EditComment(rootComment.Id, rootComment.Message, "root", true, rootComment.Sticky, time.Now())
+
 	link := "/comment/" + r.FormValue("root") + "/" + id
 	ch.notifications.InsertNotification(data.Notification{Sender: username, Reciever: replyTo, CommentLink: link, Created: time.Now()})
 	/*
