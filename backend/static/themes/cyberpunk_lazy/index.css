@@ -153,6 +153,17 @@ header {
     margin-top: 5px; /* Add margin above button */
 }
 
+.reply-submit-button {
+    cursor: pointer;
+    background-color: #2a3d20;
+    color: #08e908;
+    border: none;
+    padding: 2px 5px;
+    font-size: 10px;
+    border-radius: 2px;
+    margin-top: 5px; /* Add margin above button */
+}
+
 .edit-button {
     cursor: pointer;
     background-color: #2a3d20;

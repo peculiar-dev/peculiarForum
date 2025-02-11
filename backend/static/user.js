@@ -1,6 +1,26 @@
 
 init();
 
+//JavaScript to handle level button
+function levelClick(e) {
+    const levelBoxId = e.currentTarget.getAttribute('data-level-target');
+    const levelBox = document.getElementById(levelBoxId);
+    levelBox.levelsubmit.click();
+}
+
+//JavaScript to handle pic button
+function picClick(e) {
+    const picBoxId = e.currentTarget.getAttribute('data-pic-target');
+    const picBox = document.getElementById(picBoxId);
+    picBox.myfiles.click();
+}
+
+function filesClick(e) {
+    const filesBoxId = e.currentTarget.getAttribute('data-files-target');
+    const filesBox = document.getElementById(filesBoxId);
+    filesBox.myfiles.click();
+}
+
 function init(){
     console.log("initialize");
 
@@ -10,31 +30,19 @@ function init(){
       img.src = img.src.split('?')[0] + '?t=' + timestamp;
     }
 
-    // JavaScript to handle pic button actions
+    // JavaScript to handle level button actions
     document.querySelectorAll('.level-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const levelBoxId = this.getAttribute('data-level-target');
-            const levelBox = document.getElementById(levelBoxId);
-            levelBox.levelsubmit.click();
-        });
+        button.addEventListener('click', levelClick);
     });
 
     // JavaScript to handle pic button actions
     document.querySelectorAll('.pic-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const picBoxId = this.getAttribute('data-pic-target');
-            const picBox = document.getElementById(picBoxId);
-            picBox.myfiles.click();
-        });
+        button.addEventListener('click', picClick);
     });
 
     // JavaScript to handle files button actions
     document.querySelectorAll('.files-button').forEach(button => {
-        button.addEventListener('click', function() {
-            const filesBoxId = this.getAttribute('data-files-target');
-            const filesBox = document.getElementById(filesBoxId);
-            filesBox.myfiles.click();
-        });
+        button.addEventListener('click', filesClick);
     });
 }   
  

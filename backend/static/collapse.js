@@ -105,7 +105,9 @@
     // reply button click function
     function replyClick(e) {
         const replyBoxId = e.currentTarget.getAttribute('data-reply-target');
+        console.log("Reply Box ID:",replyBoxId);
         const replyBox = document.getElementById(replyBoxId);
+        console.log("replyBox:",replyBox);
         if (replyBox.style.display === 'block') {
             replyBox.style.display = 'none';
         } else {
@@ -156,7 +158,7 @@
     document.querySelectorAll('.reply-button').forEach(button => {
         button.addEventListener('click', replyClick);
     });
-
+    
     // JavaScript to handle edit button actions
     document.querySelectorAll('.edit-button').forEach(button => {
         button.addEventListener('click', editClick);
