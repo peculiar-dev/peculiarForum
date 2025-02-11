@@ -12,7 +12,7 @@ websocket.onerror = function(evt) { onError(evt) };
 
 function sendMessage() {
     
-    websocket.send("<img class='user-icon' src='/downloads/"+username+"/_user_icon.png' >" +username + ": " + textField.value);
+    websocket.send("<a href='/user/"+username+"'> <img class='user-icon' src='/downloads/"+username+"/_user_icon.png' alt='/user/"+username+"' ></a>" +username + ": " + textField.value);
 }
 
 function onOpen() {

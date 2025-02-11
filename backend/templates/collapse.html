@@ -46,7 +46,7 @@
 
             <div class="item-box">
                 <div class="comment">
-                    <span><img class="user-icon" src="{{(printf "/downloads/%s/_user_icon.png" .User)}}" >  {{.User}} posted:<br> </span>
+                    <span><a href="/user/{{.User}}"><img class="user-icon" src="{{(printf "/downloads/%s/_user_icon.png" .User)}}" ></a>  {{.User}} posted:<br> </span>
                     <span class="title-text"><pre>{{.Message}}</pre></span>
                     <br>
                     {{if .Picture}}
