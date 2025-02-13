@@ -52,6 +52,10 @@
                     {{if .Picture}}
                         <img class="post-pic" src="{{(printf "/downloads/%s" .Picture)}}" >
                     {{end}}
+                    {{if .Link}}
+                        <br>
+                        <a href="{{.Link}}">{{.Link}}</a>
+                    {{end}}
                 </div>
                 
 
@@ -100,7 +104,8 @@
                     <input type = "hidden" name = "source" value = "comment" />
                        <!-- <input type="textarea" name="comment" id="comment" placeholder="Write your reply here..."> -->
                     <textarea name="comment" id="comment" rows="4" cols="50">{{.Message}}</textarea>
-                    <input class="edit-submit-button" value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 
+                    <br>Link Address:<input type="text" name="linkAddr" value="{{.Link}}"> 
+                    <br><input class="edit-submit-button" value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 
                 </form>
             </div>
 
@@ -116,7 +121,8 @@
                     <input type = "hidden" name = "source" value = "comment" />
                    <!-- <input type="textarea" name="comment" id="comment" placeholder="Write your reply here..."> -->
                     <textarea name="comment" id="comment" placeholder="Write your reply here..." rows="4" cols="50"></textarea>
-                    <input class = "reply-submit-button" value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 
+                    <br>Link Address:<input type="text" name="linkAddr"> 
+                    <br><input class = "reply-submit-button" value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 
                 </form>
             </div>
         </li>

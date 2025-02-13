@@ -63,7 +63,7 @@ func (mail *MailHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.Header.Get("X-User")
 	message := r.FormValue("comment")
 	parent := r.FormValue("parent")
-	//recipient := r.FormValue("user")
+	linkAddr := r.FormValue("linkAddr")
 
 	if username == "" {
 		username = "test"
@@ -78,7 +78,7 @@ func (mail *MailHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("parent: %s\n", parent)
 	//fmt.Printf("comment:%v\n", comment)
 
-	mail.comments.InsertComment(id, r.FormValue("root"), username, message, parent, bRoot, bSticky)
+	mail.comments.InsertComment(id, r.FormValue("root"), username, message, linkAddr, parent, bRoot, bSticky)
 	//mail.comments.InsertComment(id, username, message, username+"-"+recipient, bRoot, bSticky)
 
 	log.Println("printing mail comments from:", r.FormValue("root"))
@@ -106,6 +106,8 @@ func (mail *MailHandler) IndexAddHandler(w http.ResponseWriter, r *http.Request)
 	message := r.FormValue("comment")
 	//parent := r.FormValue("parent")
 	recipient := r.FormValue("user")
+	linkAddr := r.FormValue("linkAddr")
+
 	bRoot = true
 
 	if username == "" {
@@ -121,7 +123,7 @@ func (mail *MailHandler) IndexAddHandler(w http.ResponseWriter, r *http.Request)
 	//fmt.Printf("comment:%v\n", comment)
 
 	//mail.comments.InsertComment(id, username, message, parent, bRoot, bSticky)
-	mail.comments.InsertComment(id, "", username, message, username+"-"+recipient, bRoot, bSticky)
+	mail.comments.InsertComment(id, "", username, message, linkAddr, username+"-"+recipient, bRoot, bSticky)
 
 	/*
 		log.Println("printing mail comments from:", r.FormValue("root"))

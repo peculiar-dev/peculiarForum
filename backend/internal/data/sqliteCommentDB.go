@@ -17,9 +17,10 @@ type Comment struct {
 	User     string    // The Username of the creator
 	Message  string    // The comment message
 	Picture  string    // The picture uploaded with this comment
+	Link     string    // The link uploaded with this comment
 	Root     bool      // Is this a root comment?
 	Sticky   bool      // Is this a 'sticky' or 'pinned' comment?
-	Editable bool      // not saved in database
+	Editable bool      // not saved in database! Derived from user level, giving edit rights.
 	Created  time.Time // Creation timestamp
 	Sublist  []Comment // Children of this comment
 }
@@ -74,31 +75,31 @@ func (db *SqliteCommentDB) InitDB(initialize, debug bool) {
 
 func (db *SqliteCommentDB) LoadTestComments() {
 
-	db.InsertComment("id-1", "", "test", "test message 1", "root", true, false)
-	db.InsertComment("id-2", "id-1", "test", "test message 2", "id-1", false, false)
-	db.InsertComment("id-3", "id-1", "test", "test message 3", "id-1", false, false)
-	db.InsertComment("id-4", "id-1", "test2", "test message 4", "id-3", false, false)
-	db.InsertComment("id-5", "", "test2", "test message 5", "root", true, false)
-	db.InsertComment("id-6", "id-5", "test", "test message 6", "id-5", false, false)
-	db.InsertComment("id-7", "id-5", "test2", "test message 7", "id-5", false, false)
-	db.InsertComment("id-8", "", "test", "test mail message 1", "test2-test", true, false)
-	db.InsertComment("id-9", "", "test2", "test mail message 2", "test-test2", true, false)
-	db.InsertComment("id-10", "", "test", "test message 10", "root", true, false)
-	db.InsertComment("id-11", "", "test", "test message 11", "root", true, false)
-	db.InsertComment("id-12", "", "test", "test message 12", "root", true, false)
-	db.InsertComment("id-13", "", "test", "test message 13", "root", true, false)
-	db.InsertComment("id-14", "", "test", "test message 14", "root", true, false)
-	db.InsertComment("id-15", "", "test", "test message 15", "root", true, false)
-	db.InsertComment("id-16", "", "test", "test message 16", "root", true, false)
-	db.InsertComment("id-17", "", "test", "test message 17", "root", true, false)
-	db.InsertComment("id-18", "", "test", "test message 18", "root", true, false)
-	db.InsertComment("id-19", "", "test", "test message 19", "root", true, false)
-	db.InsertComment("id-20", "", "test", "test message 20", "root", true, false)
-	db.InsertComment("id-21", "", "test", "test message 21", "root", true, false)
-	db.InsertComment("id-22", "", "test", "test message 22", "root", true, false)
-	db.InsertComment("id-23", "", "test", "test message 23", "root", true, false)
-	db.InsertComment("id-24", "", "test", "test message 24", "root", true, false)
-	db.InsertComment("id-25", "", "test", "test message 25", "root", true, false)
+	db.InsertComment("id-1", "", "test", "test message 1", "", "root", true, false)
+	db.InsertComment("id-2", "id-1", "test", "test message 2", "", "id-1", false, false)
+	db.InsertComment("id-3", "id-1", "test", "test message 3", "", "id-1", false, false)
+	db.InsertComment("id-4", "id-1", "test2", "test message 4", "", "id-3", false, false)
+	db.InsertComment("id-5", "", "test2", "test message 5", "", "root", true, false)
+	db.InsertComment("id-6", "id-5", "test", "test message 6", "", "id-5", false, false)
+	db.InsertComment("id-7", "id-5", "test2", "test message 7", "", "id-5", false, false)
+	db.InsertComment("id-8", "", "test", "test mail message 1", "", "test2-test", true, false)
+	db.InsertComment("id-9", "", "test2", "test mail message 2", "", "test-test2", true, false)
+	db.InsertComment("id-10", "", "test", "test message 10", "", "root", true, false)
+	db.InsertComment("id-11", "", "test", "test message 11", "", "root", true, false)
+	db.InsertComment("id-12", "", "test", "test message 12", "", "root", true, false)
+	db.InsertComment("id-13", "", "test", "test message 13", "", "root", true, false)
+	db.InsertComment("id-14", "", "test", "test message 14", "", "root", true, false)
+	db.InsertComment("id-15", "", "test", "test message 15", "", "root", true, false)
+	db.InsertComment("id-16", "", "test", "test message 16", "", "root", true, false)
+	db.InsertComment("id-17", "", "test", "test message 17", "", "root", true, false)
+	db.InsertComment("id-18", "", "test", "test message 18", "", "root", true, false)
+	db.InsertComment("id-19", "", "test", "test message 19", "", "root", true, false)
+	db.InsertComment("id-20", "", "test", "test message 20", "", "root", true, false)
+	db.InsertComment("id-21", "", "test", "test message 21", "", "root", true, false)
+	db.InsertComment("id-22", "", "test", "test message 22", "", "root", true, false)
+	db.InsertComment("id-23", "", "test", "test message 23", "", "root", true, false)
+	db.InsertComment("id-24", "", "test", "test message 24", "", "root", true, false)
+	db.InsertComment("id-25", "", "test", "test message 25", "", "root", true, false)
 
 	//test child comment logic.
 	db.GetChildComments("id-1", "test")
@@ -111,13 +112,14 @@ func (db *SqliteCommentDB) GetRootMail(username string) *[]Comment {
 	var user string
 	var message string
 	var picture string
+	var link string
 	var parent string
 	var root bool
 	var sticky bool
 	var editable bool
 	var created time.Time
 	//rows, err := db.Query("SELECT * FROM comment where parent = 'root' ")
-	rows, err := db.database.Query(`SELECT id, user, message, picture, parent, root, sticky, created_at
+	rows, err := db.database.Query(`SELECT id, user, message, picture, link, parent, root, sticky, created_at
     					   FROM comment
     					   WHERE root = ? AND parent LIKE ?
 						   ORDER BY created_at DESC;`, 1, "%"+username+"%")
@@ -128,10 +130,10 @@ func (db *SqliteCommentDB) GetRootMail(username string) *[]Comment {
 	defer rows.Close()
 	log.Println("root mail:")
 	for rows.Next() {
-		rows.Scan(&id, &user, &message, &picture, &parent, &root, &sticky, &created)
+		rows.Scan(&id, &user, &message, &picture, &link, &parent, &root, &sticky, &created)
 		log.Println("Comment ID:", id, " Message:", message, "Parent", parent)
 		editable = (username == user)
-		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created})
 	}
 
 	return &comments
@@ -144,13 +146,14 @@ func (db *SqliteCommentDB) GetComment(id string) *Comment {
 	var user string
 	var message string
 	var picture string
+	var link string
 	var parent string
 	var root bool
 	var sticky bool
 	var editable bool
 	var created time.Time
 	//rows, err := db.Query("SELECT * FROM comment where parent = 'root' ")
-	rows, err := db.database.Query(`SELECT id, user, message, picture, parent, root, sticky, created_at
+	rows, err := db.database.Query(`SELECT id, user, message, picture, link, parent, root, sticky, created_at
     					   FROM comment
     					   WHERE id = ?;`, id)
 
@@ -160,9 +163,9 @@ func (db *SqliteCommentDB) GetComment(id string) *Comment {
 	defer rows.Close()
 	log.Println("comment:")
 	for rows.Next() {
-		rows.Scan(&id, &user, &message, &picture, &parent, &root, &sticky, &created)
+		rows.Scan(&id, &user, &message, &picture, &link, &parent, &root, &sticky, &created)
 		log.Println("Comment ID:", id, " Message:", message, "Parent", parent, "Sticky", sticky)
-		comment = Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created}
+		comment = Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created}
 	}
 	return &comment
 }
@@ -175,13 +178,14 @@ func (db *SqliteCommentDB) GetRootComments(username string) *[]Comment {
 	var user string
 	var message string
 	var picture string
+	var link string
 	var parent string
 	var root bool
 	var sticky bool
 	var editable bool
 	var created time.Time
 	//rows, err := db.Query("SELECT * FROM comment where parent = 'root' ")
-	rows, err := db.database.Query(`SELECT id, user, message, picture, parent, root, sticky, created_at
+	rows, err := db.database.Query(`SELECT id, user, message, picture, link, parent, root, sticky, created_at
     					   FROM comment
     					   WHERE root = 1 and parent = 'root'
 						   ORDER BY created_at DESC;`)
@@ -192,7 +196,7 @@ func (db *SqliteCommentDB) GetRootComments(username string) *[]Comment {
 	defer rows.Close()
 	log.Println("root comments:")
 	for rows.Next() {
-		rows.Scan(&id, &user, &message, &picture, &parent, &root, &sticky, &created)
+		rows.Scan(&id, &user, &message, &picture, &link, &parent, &root, &sticky, &created)
 		log.Println("Comment ID:", id, " Message:", message, "Parent", parent, "Sticky", sticky)
 		editable = (username == user)
 		/*
@@ -202,7 +206,7 @@ func (db *SqliteCommentDB) GetRootComments(username string) *[]Comment {
 				comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
 			}
 		*/
-		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created})
 	}
 	//comments = append(stickyComments, comments...)
 
@@ -219,6 +223,7 @@ func (db *SqliteCommentDB) GetCommentsFromTo(username string, startIdx, endIdx i
 	var user string
 	var message string
 	var picture string
+	var link string
 	var parent string
 	var root bool
 	var sticky bool
@@ -228,7 +233,7 @@ func (db *SqliteCommentDB) GetCommentsFromTo(username string, startIdx, endIdx i
 	top := endIdx + 1
 
 	//rows, err := db.Query("SELECT * FROM comment where parent = 'root' ")
-	rows, err := db.database.Query(`SELECT id, user, message, picture, parent, root, sticky, created_at
+	rows, err := db.database.Query(`SELECT id, user, message, picture, link, parent, root, sticky, created_at
     					   FROM comment
     					   WHERE root = 1 and parent = 'root'
 						   ORDER BY created_at DESC
@@ -244,8 +249,8 @@ func (db *SqliteCommentDB) GetCommentsFromTo(username string, startIdx, endIdx i
 
 	for rows.Next() {
 		if row >= startIdx && row <= endIdx {
-			rows.Scan(&id, &user, &message, &picture, &parent, &root, &sticky, &created)
-			log.Println("Comment ID:", id, " Message:", message, "Parent", parent, "sticky:", sticky)
+			rows.Scan(&id, &user, &message, &picture, &link, &parent, &root, &sticky, &created)
+			log.Println("Comment ID:", id, " Message:", message, " link:", link, "Parent", parent, "sticky:", sticky)
 			editable = (username == user)
 			/*
 				if sticky {
@@ -254,7 +259,7 @@ func (db *SqliteCommentDB) GetCommentsFromTo(username string, startIdx, endIdx i
 					comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
 				}
 			*/
-			comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+			comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created})
 		}
 		row++
 	}
@@ -271,6 +276,7 @@ func (db *SqliteCommentDB) GetMailComments(parentID string, username string) *[]
 	var user string
 	var message string
 	var picture string
+	var link string
 	var parent string
 	var root bool
 	var sticky bool
@@ -278,13 +284,13 @@ func (db *SqliteCommentDB) GetMailComments(parentID string, username string) *[]
 	var created time.Time
 	//rows, err := db.Query("SELECT * FROM comment where parent = 'root' ")
 	rows, err := db.database.Query(`WITH RECURSIVE descendants AS (
-    					   SELECT id, user, message, picture, parent, root, sticky, created_at
+    					   SELECT id, user, message, picture, link, parent, root, sticky, created_at
     					   FROM comment
     					   WHERE id = ?
     
     					   UNION ALL
     
-    					   SELECT m.id, m.user, m.message, m.picture, m.parent, m.root, m.sticky, m.created_at
+    					   SELECT m.id, m.user, m.message, m.picture, m.link, m.parent, m.root, m.sticky, m.created_at
     					   FROM comment m
     					   INNER JOIN descendants d ON m.parent = d.id
 						   )
@@ -296,10 +302,10 @@ func (db *SqliteCommentDB) GetMailComments(parentID string, username string) *[]
 	}
 	defer rows.Close()
 	for rows.Next() {
-		rows.Scan(&id, &user, &message, &picture, &parent, &root, &sticky, &created)
+		rows.Scan(&id, &user, &message, &picture, &link, &parent, &root, &sticky, &created)
 		log.Println("Comment ID:", id, " Message:", message, "Parent", parent)
 		editable = (username == user)
-		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created})
 	}
 
 	return &comments
@@ -315,6 +321,7 @@ func (db *SqliteCommentDB) GetChildComments(parentID string, username string) *[
 	var user string
 	var message string
 	var picture string
+	var link string
 	var parent string
 	var root bool
 	var sticky bool
@@ -323,13 +330,13 @@ func (db *SqliteCommentDB) GetChildComments(parentID string, username string) *[
 
 	//rows, err := db.Query("SELECT * FROM comment where parent = 'root' ")
 	rows, err := db.database.Query(`WITH RECURSIVE descendants AS (
-    					   SELECT id, user, message, picture, parent, root, sticky, created_at
+    					   SELECT id, user, message, picture, link, parent, root, sticky, created_at
     					   FROM comment
     					   WHERE id = ?
     
     					   UNION ALL
     
-    					   SELECT m.id, m.user, m.message, m.picture, m.parent, m.root, m.sticky, m.created_at
+    					   SELECT m.id, m.user, m.message, m.picture, m.link, m.parent, m.root, m.sticky, m.created_at
     					   FROM comment m
     					   INNER JOIN descendants d ON m.parent = d.id
 						   )
@@ -342,21 +349,21 @@ func (db *SqliteCommentDB) GetChildComments(parentID string, username string) *[
 	log.Println("In getChildComments")
 	defer rows.Close()
 	for rows.Next() {
-		rows.Scan(&id, &user, &message, &picture, &parent, &root, &sticky, &created)
+		rows.Scan(&id, &user, &message, &picture, &link, &parent, &root, &sticky, &created)
 		editable = (username == user)
 		log.Println("Comment ID:", id, " Message:", message, " Parent", parent, " Editable:", editable)
 		if parent == parentID {
 			log.Println("found parent comment")
-			comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+			comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created})
 		} else if root {
 			log.Println("found root comment")
-			rootComment = Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created}
+			rootComment = Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created}
 
 			//comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
 
 		} else {
 			log.Println("adding ", id, " to parent ", parent)
-			addCommentToSublist(&comments, parent, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
+			addCommentToSublist(&comments, parent, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created})
 		}
 	}
 
@@ -384,6 +391,7 @@ func (db *SqliteCommentDB) CreateCommentTable() {
 	"user" TEXT,
 	"message" TEXT,
 	"picture" TEXT,
+	"link" TEXT,
 	"parent" TEXT,
 	"root" BIT,
 	"sticky" BIT,
@@ -399,39 +407,39 @@ func (db *SqliteCommentDB) CreateCommentTable() {
 	log.Println("comment table created")
 }
 
-func (db *SqliteCommentDB) InsertComment(id, rootID, user, message, parent string, root bool, sticky bool) {
+func (db *SqliteCommentDB) InsertComment(id, rootID, user, message, link, parent string, root bool, sticky bool) {
 	currentTime := time.Now()
 
 	//message = strings.Replace(message, "\n", "<br>", -1)
 
 	log.Println("Inserting comment record ...")
-	insertCommentSQL := `INSERT INTO comment(id, root_id, user, message,picture, parent,root,sticky,created_at) VALUES (?,?, ?, ?, ?, ?, ?, ?,?)`
+	insertCommentSQL := `INSERT INTO comment(id, root_id, user, message,picture, link, parent,root,sticky,created_at) VALUES (?,?,?, ?, ?, ?, ?, ?, ?,?)`
 	statement, err := db.database.Prepare(insertCommentSQL) // Prepare statement.
 	// This is good to avoid SQL injections
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	_, err = statement.Exec(id, rootID, user, message, "", parent, root, sticky, currentTime)
+	_, err = statement.Exec(id, rootID, user, message, "", link, parent, root, sticky, currentTime)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 }
 
-func (db *SqliteCommentDB) EditComment(id, message, parent string, root bool, sticky bool, created time.Time) {
+func (db *SqliteCommentDB) EditComment(id, message, link, parent string, root bool, sticky bool, created time.Time) {
 
 	//message = strings.Replace(message, "\n", "<br>", -1)
 
 	log.Println("Editing comment record ...")
 	//insertCommentSQL := `INSERT INTO comment(id, user, message, parent,root,sticky,created_at) VALUES (?, ?, ?, ?, ?, ?,?)`
 
-	editCommentSQL := `UPDATE comment SET message = ?, sticky = ?, created_at = ? WHERE id =?`
+	editCommentSQL := `UPDATE comment SET message = ?, link =?, sticky = ?, created_at = ? WHERE id =?`
 	statement, err := db.database.Prepare(editCommentSQL) // Prepare statement.
 	// This is good to avoid SQL injections
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 	//_, err = statement.Exec(id, user, message, parent, root, sticky, currentTime)
-	_, err = statement.Exec(message, sticky, created, id)
+	_, err = statement.Exec(message, link, sticky, created, id)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

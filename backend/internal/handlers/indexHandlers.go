@@ -99,10 +99,13 @@ func (index *IndexHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 
 	var bRoot bool
 	var bSticky bool
+	//var commentLink string
 
 	id := uuid.New().String()
 	username := r.Header.Get("X-User")
 	message := r.FormValue("comment")
+	linkAddr := r.FormValue("linkAddr")
+
 	parent := "root"
 	bRoot = true
 	page, err := strconv.Atoi(r.FormValue("page"))
@@ -114,9 +117,9 @@ func (index *IndexHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 		username = "test"
 	}
 
-	index.comments.InsertComment(id, "", username, message, parent, bRoot, bSticky)
+	index.comments.InsertComment(id, "", username, message, linkAddr, parent, bRoot, bSticky)
 
-	log.Println("In add index, user:", username)
+	log.Println("In add index, user:", username, " link:", linkAddr)
 	//currentComments := index.comments.GetRootComments(username)
 	start := 0
 	end := (page * index.pageSize) - 1
@@ -141,6 +144,9 @@ func (index *IndexHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 	message := r.FormValue("comment")
 	parent := r.FormValue("parent")
 	id := r.FormValue("id")
+
+	linkAddr := r.FormValue("linkAddr")
+
 	page, err := strconv.Atoi(r.FormValue("page"))
 	if err != nil {
 		log.Println("Error, invalid page in IndexPageHandler.")
@@ -184,7 +190,7 @@ func (index *IndexHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 		updateTime = updateTime.Add(-(30 * 24 * time.Hour)) // now - 30 days
 	}
 
-	index.comments.EditComment(id, message, parent, bRoot, bSticky, updateTime)
+	index.comments.EditComment(id, message, linkAddr, parent, bRoot, bSticky, updateTime)
 
 	log.Println("In edit index, user:", username)
 	//currentComments := index.comments.GetRootComments(username)

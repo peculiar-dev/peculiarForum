@@ -63,6 +63,7 @@ func (ch *CommentHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	message := r.FormValue("comment")
 	parent := r.FormValue("parent")
 	replyTo := r.FormValue("replyTo")
+	linkAddr := r.FormValue("linkAddr")
 
 	if username == "" {
 		username = "test"
@@ -76,13 +77,13 @@ func (ch *CommentHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("parent: %s\n", parent)
 	//fmt.Printf("comment:%v\n", comment)
 
-	ch.comments.InsertComment(id, r.FormValue("root"), username, message, parent, bRoot, bSticky)
+	ch.comments.InsertComment(id, r.FormValue("root"), username, message, linkAddr, parent, bRoot, bSticky)
 	/* db.InsertNotification(Notification{Sender: "test2", Reciever: "test", CommentLink: "/comment/id-1/id-2", Created: time.Now()})
 	 */
 
 	rootComment := ch.comments.GetComment(r.FormValue("root"))
 
-	ch.comments.EditComment(rootComment.Id, rootComment.Message, "root", true, rootComment.Sticky, time.Now())
+	ch.comments.EditComment(rootComment.Id, rootComment.Message, rootComment.Link, "root", true, rootComment.Sticky, time.Now())
 
 	link := "/comment/" + r.FormValue("root") + "/" + id
 	ch.notifications.InsertNotification(data.Notification{Sender: username, Reciever: replyTo, CommentLink: link, Created: time.Now()})
@@ -113,6 +114,7 @@ func (ch *CommentHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 	message := r.FormValue("comment")
 	parent := r.FormValue("parent")
 	id := r.FormValue("id")
+	linkAddr := r.FormValue("linkAddr")
 
 	if username == "" {
 		username = "test"
@@ -126,7 +128,7 @@ func (ch *CommentHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("parent: %s\n", parent)
 	//fmt.Printf("comment:%v\n", comment)
 
-	ch.comments.EditComment(id, message, parent, bRoot, bSticky, ch.comments.GetComment(id).Created)
+	ch.comments.EditComment(id, message, linkAddr, parent, bRoot, bSticky, ch.comments.GetComment(id).Created)
 	/*
 		AddCommentToSublist(&comments, parent, comment)
 		log.Println("added to sublist")

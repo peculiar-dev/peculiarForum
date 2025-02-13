@@ -40,10 +40,10 @@
                 <form hx-swap="innerHTML" hx-target="#comment-list" hx-post="/indexAddComment"> 
                     <textarea name="comment" id="comment" placeholder="Write your comment here..." rows="4" cols="50"></textarea>
                     <input type = "hidden" name = "page" value = "{{$.Page}}" />
-                    <input value="Submit" type="submit" onclick='current_comment = "post-box";'> 
+                    <br>Link Address:<input type="text" name="linkAddr"> 
+                    <br><input value="Submit" type="submit" onclick='current_comment = "post-box";'> 
                 </form>
             </div>
-
 </head>
 <body>
 
@@ -81,6 +81,10 @@
                     <br>
                     {{if .Picture}}
                         <img class="post-pic" src="{{(printf "/downloads/%s" .Picture)}}" >
+                    {{end}}
+                    {{if .Link}}
+                        <br>
+                        <a href="{{.Link}}">{{.Link}}</a>
                     {{end}}
                 </div>
                 
@@ -123,7 +127,9 @@
                     <input type = "hidden" name = "source" value = "index" />
                     <input type = "hidden" name = "page" value = "{{$.Page}}" />
                        <!-- <input type="textarea" name="comment" id="comment" placeholder="Write your reply here..."> -->
-                    <textarea name="comment" id="comment" rows="4" cols="40">{{.Message}}</textarea><br>
+                    <textarea name="comment" id="comment" rows="4" cols="40">{{.Message}}</textarea>
+                    <br>Link Address:<input type="text" name="linkAddr" value="{{.Link}}"> 
+                    <br>
                     {{if eq $.User.Level 100}}
                     <input type="checkbox" id="sticky" name="sticky" value="true" {{if .Sticky}}checked{{end}}>sticky <br>
                     {{end}}
