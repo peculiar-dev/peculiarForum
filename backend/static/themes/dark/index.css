@@ -7,8 +7,8 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background-color: #555353;
-    color: #c2bdbd;
+    background-color: #000000;
+    color: #000000;
 }
 
 header {
@@ -92,6 +92,7 @@ header {
 
 .chatContainer {
   height: 100%;
+  color: #f5f0d1;
 }
 
 .link-button {
