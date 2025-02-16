@@ -1,18 +1,19 @@
 
 body {
+    width: fit-content;
     font-family: Arial, sans-serif;
-    margin: 0;
+    margin: auto;
     padding: 0;
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background-color: #ccc;
+    background-color: #0089da;;
+    color: #000000;
 }
 
 header {
-    background-color: #333;
-    color: white;
-    padding: 10px;
+    background-color: #0089da;;
+    color: #0089da;;
     text-align: center;
 }
 
@@ -21,14 +22,14 @@ header {
     justify-content: space-between;
     gap: 10px;
     padding: 10px;
-    background-color: #f4f4f4;
+    background-color: #0089da;;
 }
 
 .header-button {
     /*content:url(/static/themes/light/_user_icon.png);*/
     cursor: pointer;
-    background-color: #007BFF;
-    color: white;
+    background-color: #c0c0c0;
+    color: #000000;
     border: none;
     padding: 2px 5px;
     font-size: 20px;
@@ -40,37 +41,49 @@ header {
 
 }
 
+#banner {
+    content:url(/static/themes/vaporwave/banner.png);
+    width: 400px;
+    background-color: #ffffff00;
+ }
 
 #home-button {
-    content:url(/static/themes/light/explorer.jpg);
+    content:url(/static/themes/vaporwave/index.png);
     height: 50px;
     width: 50px;
     background-color: #ffffff00;
  }
 
  #mail-button {
-    content:url(/static/themes/light/cube.jpg);
+    content:url(/static/themes/vaporwave/mail.png);
     height: 50px;
     width: 50px;
     background-color: #ffffff00;
  }
 
  #notification-button {
-    content:url(/static/themes/light/glitch.jpg);
+    content:url(/static/themes/vaporwave/notifications.png);
     height: 50px;
     width: 50px;
     background-color: #ffffff00;
  }
 
  #chat-button {
-    content:url(/static/themes/light/error.jpg);
+    content:url(/static/themes/vaporwave/chat.png);
     height: 50px;
     width: 50px;
     background-color: #ffffff00;
  }
 
  #user-button {
-    content:url(/static/themes/light/face.jpg);
+    content:url(/static/themes/vaporwave/settings.png);
+    height: 50px;
+    width: 50px;
+    background-color: #ffffff00;
+ }
+
+ #next-page-button{
+    content:url(/static/themes/vaporwave/more.png);
     height: 50px;
     width: 50px;
     background-color: #ffffff00;
@@ -81,44 +94,10 @@ header {
   height: 100%;
 }
 
-/*
-.button {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border: 1px solid #ccc;
-    background-color: #fff;
-}
-
-.button-row button:hover {
-    background-color: #ddd;
-}
-
-
-a:link, a:visited {
-    cursor: pointer;
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    padding: 2px 5px;
-    font-size: 10px;
-    border-radius: 2px;
-    margin-top: 5px; 
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-  }
-  
-  a:hover, a:active {
-    background-color: red;
-  }
-
-*/
-
 .link-button {
     cursor: pointer;
-    background-color: #007BFF;
-    color: white;
+    background-color: #c0c0c0;
+    color: #000000;
     border: none;
     padding: 2px 5px;
     font-size: 10px;
@@ -133,7 +112,7 @@ a:link, a:visited {
     /* padding: 10px; */
     /* border: 1px solid #ccc; */
     /* margin: 5px 0; */
-    background-color: #f9f9f9;
+    background-color: #000000;
     display: flex;
     flex-direction: column; /* Change to column layout */
     /* max-width: 800px; */
@@ -153,8 +132,8 @@ a:link, a:visited {
 
 .collapse-button {
     cursor: pointer;
-    background-color: #007BFF;
-    color: white;
+    background-color: #c0c0c0;
+    color: #000000;
     border: none;
     padding: 2px 5px;
     font-size: 10px;
@@ -164,8 +143,19 @@ a:link, a:visited {
 
 .reply-button {
     cursor: pointer;
-    background-color: #007BFF;
-    color: white;
+    background-color: #c0c0c0;
+    color: #000000;
+    border: none;
+    padding: 2px 5px;
+    font-size: 10px;
+    border-radius: 2px;
+    margin-top: 5px; /* Add margin above button */
+}
+
+.reply-submit-button {
+    cursor: pointer;
+    background-color: #c0c0c0;
+    color: #000000;
     border: none;
     padding: 2px 5px;
     font-size: 10px;
@@ -175,8 +165,8 @@ a:link, a:visited {
 
 .edit-button {
     cursor: pointer;
-    background-color: #007BFF;
-    color: white;
+    background-color: #c0c0c0;
+    color: #000000;
     border: none;
     padding: 2px 5px;
     font-size: 10px;
@@ -194,7 +184,8 @@ a:link, a:visited {
 .reply-box {
     display: none; /* Hidden initially */
     padding: 10px;
-    background-color: #f0f0f0;
+    background-color: #ffffff;
+    color: #000000;
     border: 1px solid #ccc;
     margin: 5px 0;
     max-width: 800px;
@@ -204,8 +195,19 @@ a:link, a:visited {
 
 .pic-button {
     cursor: pointer;
-    background-color: #007BFF;
-    color: white;
+    background-color: #c0c0c0;
+    color: #000000;
+    border: none;
+    padding: 2px 5px;
+    font-size: 10px;
+    border-radius: 2px;
+    margin-top: 5px; /* Add margin above button */
+}
+
+.edit-submit-button {
+    cursor: pointer;
+    background-color: #c0c0c0;
+    color: #000000;
     border: none;
     padding: 2px 5px;
     font-size: 10px;
@@ -216,7 +218,8 @@ a:link, a:visited {
 .pic-box {
     display: none; /* Hidden initially */
     padding: 10px;
-    background-color: #f0f0f0;
+    background-color: #ffffff;
+    color: #000000;
     border: 1px solid #ccc;
     margin: 5px 0;
     max-width: 800px;
@@ -227,7 +230,8 @@ a:link, a:visited {
 .edit-box {
     display: none; /* Hidden initially */
     padding: 10px;
-    background-color: #f0f0f0;
+    background-color: #ffffff;
+    color: #000000;
     border: 1px solid #ccc;
     margin: 5px 0;
     max-width: 800px;
@@ -238,7 +242,8 @@ a:link, a:visited {
 .post-box {
     display: none; /* Hidden initially */
     padding: 10px;
-    background-color: #f0f0f0;
+    background-color: #ffffff;
+    color: #000000;
     border: 1px solid #ccc;
     margin: 5px 0;
     max-width: 800px;
@@ -247,11 +252,13 @@ a:link, a:visited {
 }
 
 .post-box textarea {
-    width: 100%;
+    width: 98%;
     height: 80px;
     padding: 5px;
     font-size: 14px;
     margin-bottom: 10px; /* Add spacing below textarea */
+    background-color: #ffffff;
+    color: #000000;
 }
 
 .edit-box textarea {
@@ -260,6 +267,8 @@ a:link, a:visited {
     padding: 5px;
     font-size: 14px;
     margin-bottom: 10px; /* Add spacing below textarea */
+    background-color: #ffffff;
+    color: #000000;
 }
 
 .reply-box textarea {
@@ -268,12 +277,14 @@ a:link, a:visited {
     padding: 5px;
     font-size: 14px;
     margin-bottom: 10px; /* Add spacing below textarea */
+    background-color: #ffffff;
+    color: #000000;
 }
 
 .post-button {
     cursor: pointer;
-    background-color: #007BFF;
-    color: white;
+    background-color: #c0c0c0;
+    color: #000000;
     border: none;
     padding: 5px 15px;
     font-size: 14px;
@@ -283,8 +294,8 @@ a:link, a:visited {
 
 .send-button {
     cursor: pointer;
-    background-color: #007BFF;
-    color: white;
+    background-color: #c0c0c0;
+    color: #000000;
     border: none;
     padding: 5px 15px;
     font-size: 14px;
@@ -294,7 +305,8 @@ a:link, a:visited {
 
 .instructions {
     font-size: 14px;
-    color: #666;
+    background-color: #c0c0c0;
+    color: #000000;
     margin-bottom: 5px;
 }
 
@@ -313,17 +325,18 @@ li {
     border: 1px solid #ccc; /* Border around list items */
     padding: 10px; /* Padding inside the list item */
     margin: 5px 0; /* Spacing between list items */
-    background-color: #f9f9f9; /* Background color for list items */
+    background-color: #000000;
+    color: #ff81ea;
     border-radius: 5px; /* Rounded corners for list items */
 }
 
 pre {
+    min-width: 250px;
     white-space: pre-wrap;       /* Since CSS 2.1 */
     white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
     white-space: -pre-wrap;      /* Opera 4-6 */
     white-space: -o-pre-wrap;    /* Opera 7 */
     word-wrap: break-word;       /* Internet Explorer 5.5+ */
-    white-space:pre-line;
     line-height: 1; 
 }
 
@@ -333,6 +346,6 @@ pre {
 }
 
 .post-pic{
-    width:400px;
+    width:370px;
     height: auto;
 }
