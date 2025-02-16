@@ -11,10 +11,15 @@ services:
         source: ./proxy/.htpasswd
         target: /etc/nginx/conf.d/.htpasswd
         read_only: true
-      - /etc/letsencrypt:/usr/share/nginx/certs
-#      - ./proxy/static:/usr/share/nginx/html/static
-#      - ./backend/downloads:/usr/share/nginx/html/results
-
+      - type: bind
+        source: ./proxy//fullchain.pem
+        target: /etc/nginx/conf.d/fullchain.pem
+        read_only: true
+      - type: bind
+        source: ./proxy/privkey.pem
+        target: /etc/nginx/conf.d/privkey.pem
+        read_only: true
+        
     ports:
       - 80:80
       - 443:443
