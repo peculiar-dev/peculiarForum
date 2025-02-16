@@ -1,6 +1,11 @@
 // ****************** shared websocket code **************************
-
-var wsUri = "ws://" + document.location.hostname + ":" + 8080 + "/chatSocket";
+console.log(document.location.hostname);
+var wsUri
+if (document.location.hostname === "localhost") {
+    wsUri = "ws://" + document.location.hostname + ":" + 8080 + "/chatSocket";
+}else {
+    wsUri = "wss://" + document.location.hostname + "/chatSocket";
+}
 var websocket = new WebSocket(wsUri);
 
 var username;
