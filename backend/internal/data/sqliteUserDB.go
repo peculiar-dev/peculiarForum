@@ -153,20 +153,43 @@ func (db *SqliteUserDB) InsertUser(user *User) {
 		err := os.MkdirAll(dirPath, 0755)
 		if err != nil {
 			//panic(err)
-			log.Println("Error creating file directory:", err)
+			log.Println("Error creating user directory:", err)
 		}
-		println("Directory created successfully.")
+		println("user directory created successfully.")
 	} else if err != nil {
 		panic(err)
 	} else {
-		println("Directory already exists.")
+		println("User directory already exists.")
 	}
 
-	_, err = copy("./static/themes/light/_user_icon.png", "./downloads/"+user.Username+"/_user_icon.png")
-	if err != nil {
-		log.Println("Error copying file:", err)
+	dirPath = "./downloads/user/" + user.Username
+
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		// Create the directory with 0755 permissions
+		err := os.MkdirAll(dirPath, 0755)
+		if err != nil {
+			//panic(err)
+			log.Println("Error creating user web directory:", err)
+		}
+		println("User web directory created successfully.")
+	} else if err != nil {
+		panic(err)
 	} else {
-		log.Println("File copied successfully.")
+		println("User web directory already exists.")
+	}
+
+	_, err = copy("./static/default/_user_icon.png", "./downloads/"+user.Username+"/_user_icon.png")
+	if err != nil {
+		log.Println("Error copying default user icon:", err)
+	} else {
+		log.Println("User Icon copied successfully.")
+	}
+
+	_, err = copy("./static/default/index.html", "./downloads/user/"+user.Username+"/index.html")
+	if err != nil {
+		log.Println("Error copying default default index.html:", err)
+	} else {
+		log.Println("default html copied successfully.")
 	}
 
 }
@@ -201,7 +224,7 @@ func (db *SqliteUserDB) UpdateUser(user *User) {
 
 func (db *SqliteUserDB) LoadTestUsers() {
 
-	db.InsertUser(&User{Username: "test", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 100, Email: ""})
+	//db.InsertUser(&User{Username: "test", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 100, Email: ""})
 	db.InsertUser(&User{Username: "test2", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 0, Email: ""})
 	db.InsertUser(&User{Username: "test3", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 0, Email: ""})
 	db.InsertUser(&User{Username: "test4", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 0, Email: ""})
