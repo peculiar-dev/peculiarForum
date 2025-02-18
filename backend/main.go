@@ -161,7 +161,7 @@ func main() {
 
 	// user
 
-	http.HandleFunc("/user", userHandler.IndexHandler)
+	http.HandleFunc("/settings", userHandler.IndexHandler)
 	http.HandleFunc("/userUpdate", userHandler.UpdateHandler)
 	http.HandleFunc("/userLevelUpdate", userHandler.UpdateLevelHandler)
 	http.HandleFunc("/userIconUpload", userHandler.UploadPhotoHandler)
