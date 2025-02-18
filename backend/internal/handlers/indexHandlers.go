@@ -207,11 +207,12 @@ func (index *IndexHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 
 func (index *IndexHandler) UploadHandler(w http.ResponseWriter, r *http.Request) {
 
-	username := ""
 	id := ""
 	root := ""
 	filename := ""
 	page := 0
+
+	username := extractBasicAuthUsername(r)
 
 	// Ensure the request is a POST
 	if r.Method != http.MethodPost {
@@ -256,16 +257,18 @@ func (index *IndexHandler) UploadHandler(w http.ResponseWriter, r *http.Request)
 			}
 		} else {
 			// Process hidden fields (assuming they have a name)
-			if part.FormName() == "X-User" {
-				data, err := io.ReadAll(part)
-				if err != nil {
-					log.Println("error reading hidden field:", err.Error())
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
+			/*
+				if part.FormName() == "X-User" {
+					data, err := io.ReadAll(part)
+					if err != nil {
+						log.Println("error reading hidden field:", err.Error())
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
+					log.Println("X-User field value:", string(data))
+					username = string(data)
 				}
-				log.Println("X-User field value:", string(data))
-				username = string(data)
-			}
+			*/
 			if part.FormName() == "id" {
 				data, err := io.ReadAll(part)
 				if err != nil {

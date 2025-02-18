@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/base64"
 	"fmt"
 	"html/template"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"os"
 	"peculiarity/internal/data"
 	"strconv"
+	"strings"
 )
 
 type UserHandler struct {
@@ -192,12 +194,40 @@ func (userHandler *UserHandler) UpdateLevelHandler(w http.ResponseWriter, r *htt
 	}
 }
 
+func extractBasicAuthUsername(r *http.Request) string {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		return ""
+	}
+
+	// Authorization header format: "Basic base64(username:password)"
+	parts := strings.SplitN(authHeader, " ", 2)
+	if len(parts) != 2 || parts[0] != "Basic" {
+		return ""
+	}
+
+	decoded, err := base64.StdEncoding.DecodeString(parts[1])
+	if err != nil {
+		return ""
+	}
+
+	// Extract username from "username:password"
+	creds := strings.SplitN(string(decoded), ":", 2)
+	if len(creds) < 1 {
+		return ""
+	}
+
+	return creds[0] // Return the username
+}
+
 func (userHandler *UserHandler) UploadPhotoHandler(w http.ResponseWriter, r *http.Request) {
 
 	var users *[]data.User
 
-	username := ""
 	filename := "_user_icon.png"
+
+	//username := r.Header.Get("X-User")
+	username := extractBasicAuthUsername(r)
 
 	// Ensure the request is a POST
 	if r.Method != http.MethodPost {
@@ -242,21 +272,24 @@ func (userHandler *UserHandler) UploadPhotoHandler(w http.ResponseWriter, r *htt
 			}
 		} else {
 			// Process hidden fields (assuming they have a name)
-			if part.FormName() == "X-User" {
-				data, err := io.ReadAll(part)
-				if err != nil {
-					log.Println("error reading hidden field:", err.Error())
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
+			/*
+				if part.FormName() == "X-User" {
+					data, err := io.ReadAll(part)
+					if err != nil {
+						log.Println("error reading hidden field:", err.Error())
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
+					log.Println("X-User field value:", string(data))
+					username = string(data)
 				}
-				log.Println("X-User field value:", string(data))
-				username = string(data)
-			}
+			*/
 
 		}
 	}
 
 	log.Println("in upload Handler")
+	log.Println("User:" + username)
 
 	if username == "" {
 		username = "test"
@@ -320,8 +353,9 @@ func (userHandler *UserHandler) UploadFileHandler(w http.ResponseWriter, r *http
 
 	var users *[]data.User
 
-	username := ""
 	filename := ""
+
+	username := extractBasicAuthUsername(r)
 
 	// Ensure the request is a POST
 	if r.Method != http.MethodPost {
@@ -367,16 +401,18 @@ func (userHandler *UserHandler) UploadFileHandler(w http.ResponseWriter, r *http
 			}
 		} else {
 			// Process hidden fields (assuming they have a name)
-			if part.FormName() == "X-User" {
-				data, err := io.ReadAll(part)
-				if err != nil {
-					log.Println("error reading hidden field:", err.Error())
-					http.Error(w, err.Error(), http.StatusInternalServerError)
-					return
+			/*
+				if part.FormName() == "X-User" {
+					data, err := io.ReadAll(part)
+					if err != nil {
+						log.Println("error reading hidden field:", err.Error())
+						http.Error(w, err.Error(), http.StatusInternalServerError)
+						return
+					}
+					log.Println("X-User field value:", string(data))
+					username = string(data)
 				}
-				log.Println("X-User field value:", string(data))
-				username = string(data)
-			}
+			*/
 
 		}
 	}
