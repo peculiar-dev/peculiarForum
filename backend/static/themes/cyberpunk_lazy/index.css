@@ -323,12 +323,17 @@ ul ul {
 
 /* New styles for list items */
 li {
+    word-wrap: break-word;
     border: 1px solid #ccc; /* Border around list items */
     padding: 10px; /* Padding inside the list item */
     margin: 5px 0; /* Spacing between list items */
     background-color: #000000;
     color: #08e908;
     border-radius: 5px; /* Rounded corners for list items */
+}
+
+.index-comments {
+    max-width: 400px;
 }
 
 pre {

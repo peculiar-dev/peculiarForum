@@ -61,7 +61,7 @@
     <ul id="comment-list" style="list-style-type:none; padding-left: 0;">
     {{block "comment-list-item" .}} 
     {{range .Comments}} 
-        <li>
+        <li class="index-comments">
             
             <!--{{ $itemId := (printf "item-%d" .Id) }} --><!-- Unique ID for each item -->
             <!--{{ $replyBoxId := (printf "reply-box-%d" .Id) }} --><!-- Unique ID for each reply box -->

@@ -8,7 +8,7 @@ body {
     flex-direction: column;
     height: 100vh;
     background-color: #000000;
-    color: #000000;
+    color: #f5f0d1;
 }
 
 header {
@@ -323,12 +323,16 @@ ul ul {
 
 /* New styles for list items */
 li {
+    word-wrap: break-word;
     border: 1px solid #ccc; /* Border around list items */
     padding: 10px; /* Padding inside the list item */
     margin: 5px 0; /* Spacing between list items */
     background-color: #555353;
     color: #f5f0d1;
     border-radius: 5px; /* Rounded corners for list items */
+}
+.index-comments {
+    max-width: 400px;
 }
 
 pre {
