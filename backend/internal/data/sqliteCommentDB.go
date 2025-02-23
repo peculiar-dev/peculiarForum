@@ -42,6 +42,8 @@ func NewSqliteCommentDB() *SqliteCommentDB {
 }
 
 func (db *SqliteCommentDB) InitDB(initialize, debug bool) {
+	var sqliteDatabase *sql.DB
+
 	if initialize {
 		os.Remove("sqlite-database.db") // I delete the file to avoid duplicated records.
 		// SQLite is a file based database.
@@ -54,9 +56,19 @@ func (db *SqliteCommentDB) InitDB(initialize, debug bool) {
 		file.Close()
 		log.Println("sqlite-database.db created")
 	}
-	sqliteDatabase, error := sql.Open("sqlite3", "./sqlite-database.db") // Open the SQLite File
-	if error != nil {
-		log.Fatal(error.Error())
+
+	if debug {
+		var error error
+		sqliteDatabase, error = sql.Open("sqlite3", "./sqlite-database.db") // Open the local File
+		if error != nil {
+			log.Fatal(error.Error())
+		}
+	} else {
+		var error error
+		sqliteDatabase, error = sql.Open("sqlite3", "/etc/nginx/conf.d/sqlite-database.db") // Open the container file
+		if error != nil {
+			log.Fatal(error.Error())
+		}
 	}
 	//defer sqliteDatabase.Close() // Defer Closing the database
 

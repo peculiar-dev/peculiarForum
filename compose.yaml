@@ -33,4 +33,5 @@ services:
     volumes:
       - ./backend/downloads:/usr/src/app/downloads     
       - ./backend/static:/usr/src/app/static
+      - ./backend/sqlite-database.db:/etc/nginx/conf.d/sqlite-database.db
 

@@ -149,6 +149,7 @@ func (userHandler *UserHandler) UpdateLevelHandler(w http.ResponseWriter, r *htt
 	var users *[]data.User
 
 	username := r.Header.Get("X-User")
+
 	updateName := r.FormValue("user")
 	//level := r.FormValue("level")
 	level, err := strconv.Atoi(r.FormValue("level"))
