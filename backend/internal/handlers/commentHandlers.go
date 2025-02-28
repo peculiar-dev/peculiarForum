@@ -82,8 +82,9 @@ func (ch *CommentHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	 */
 
 	rootComment := ch.comments.GetComment(r.FormValue("root"))
-
-	ch.comments.EditComment(rootComment.Id, rootComment.Message, rootComment.Link, "root", true, rootComment.Sticky, time.Now())
+	if !rootComment.Sticky { // if the root is not sticky, move the root to the top of the page.
+		ch.comments.EditComment(rootComment.Id, rootComment.Message, rootComment.Link, "root", true, rootComment.Sticky, time.Now())
+	}
 
 	link := "/comment/" + r.FormValue("root") + "/" + id
 	ch.notifications.InsertNotification(data.Notification{Sender: username, Reciever: replyTo, CommentLink: link, Created: time.Now()})
