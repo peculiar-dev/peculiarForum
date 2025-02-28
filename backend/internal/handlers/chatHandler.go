@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"net/url"
 	"peculiarity/internal/data"
-	"slices"
 	"unicode/utf8"
 
 	"github.com/gorilla/websocket"
@@ -98,13 +97,24 @@ func (chat *ChatHandler) ChatSocket(w http.ResponseWriter, r *http.Request) {
 
 						if user.Connection != nil {
 							user.Connection.Close()
+							user.Name = "_remove"
+
 						}
-						log.Println("debug:", "removing user:", idx)
-						chat.clients = slices.Delete(chat.clients, idx, idx+1)
+
 					}
 				}
 			}
 		}
+		log.Println("clearning up")
+		var temp []*ChatUser
+		for idx, user := range chat.clients {
+			if user.Name != "_remove" {
+				temp = append(temp, user)
+			} else {
+				log.Println("debug:", "removing user:", idx)
+			}
+		}
+		chat.clients = temp
 	}
 
 }
