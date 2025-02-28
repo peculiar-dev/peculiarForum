@@ -262,7 +262,7 @@ func (db *SqliteCommentDB) GetCommentsFromTo(username string, startIdx, endIdx i
 	for rows.Next() {
 		if row >= startIdx && row <= endIdx {
 			rows.Scan(&id, &user, &message, &picture, &link, &parent, &root, &sticky, &created)
-			log.Println("Comment ID:", id, " Message:", message, " link:", link, "Parent", parent, "sticky:", sticky)
+			log.Println("Comment ID:", id, " timestamp", created.Format("2006-01-02 15:04:05"), " Message:", message, " link:", link, "Parent", parent, "sticky:", sticky)
 			editable = (username == user)
 			/*
 				if sticky {

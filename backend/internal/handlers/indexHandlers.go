@@ -77,7 +77,7 @@ func (index *IndexHandler) IndexPageHandler(w http.ResponseWriter, r *http.Reque
 
 	page, err := strconv.Atoi(r.PathValue("page"))
 	if err != nil {
-		log.Println("Error, invalid page in IndexPageHandler.")
+		log.Println("No page data, serving page 0.")
 	}
 
 	start := (page * index.pageSize)
@@ -110,7 +110,7 @@ func (index *IndexHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	bRoot = true
 	page, err := strconv.Atoi(r.FormValue("page"))
 	if err != nil {
-		log.Println("Error, invalid page in IndexPageHandler.")
+		log.Println("No page in page add, serving 0.")
 	}
 
 	if username == "" {
@@ -149,7 +149,7 @@ func (index *IndexHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 
 	page, err := strconv.Atoi(r.FormValue("page"))
 	if err != nil {
-		log.Println("Error, invalid page in IndexPageHandler.")
+		log.Println("No page in page edit, serving 0.")
 	}
 
 	log.Println("sticky:", r.FormValue("sticky"))
@@ -184,11 +184,10 @@ func (index *IndexHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 	// if current comment was not sticky, but is now sticky, add 30 days to now
 	if !currentComment.Sticky && bSticky {
 		updateTime = updateTime.Add(30 * 24 * time.Hour) // now + 30 days
+	} else {
+		updateTime = time.Now()
 	}
-	// if current comment was sticky, but is now not sticky, subtract 30 days from now.
-	if currentComment.Sticky && !bSticky {
-		updateTime = updateTime.Add(-(30 * 24 * time.Hour)) // now - 30 days
-	}
+	// if current comment was sticky, but is now not sticky, just set it to today.
 
 	index.comments.EditComment(id, message, linkAddr, parent, bRoot, bSticky, updateTime)
 
