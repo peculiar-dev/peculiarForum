@@ -121,7 +121,7 @@ func main() {
 	}
 
 	indexhandler := handlers.NewIndexHandler(commentsdb, userdb, 10)
-	mailhandler := handlers.NewMailHandler(commentsdb, userdb)
+	mailhandler := handlers.NewMailHandler(commentsdb, userdb, notificationdb)
 	commentHandler := handlers.NewCommentHandler(commentsdb, notificationdb, userdb)
 	notificationHandler := handlers.NewNotificationHandler(notificationdb, userdb)
 	userHandler := handlers.NewUserHandler(userdb)

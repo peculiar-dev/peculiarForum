@@ -8,13 +8,15 @@ import (
 	"net/http"
 	"os"
 	"peculiarity/internal/data"
+	"time"
 
 	"github.com/google/uuid"
 )
 
 type MailHandler struct {
-	comments data.Commentdb
-	users    data.Userdb
+	comments      data.Commentdb
+	users         data.Userdb
+	notifications data.Notificationdb
 }
 
 type MailIndexData struct {
@@ -23,8 +25,8 @@ type MailIndexData struct {
 	User     *data.User
 }
 
-func NewMailHandler(commentdb data.Commentdb, userdb data.Userdb) *MailHandler {
-	return &MailHandler{comments: commentdb, users: userdb}
+func NewMailHandler(commentdb data.Commentdb, userdb data.Userdb, notificationdb data.Notificationdb) *MailHandler {
+	return &MailHandler{comments: commentdb, users: userdb, notifications: notificationdb}
 }
 
 func (mail *MailHandler) IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -64,6 +66,7 @@ func (mail *MailHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	message := r.FormValue("comment")
 	parent := r.FormValue("parent")
 	linkAddr := r.FormValue("linkAddr")
+	replyTo := r.FormValue("replyTo")
 
 	if username == "" {
 		username = "test"
@@ -80,6 +83,9 @@ func (mail *MailHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 
 	mail.comments.InsertComment(id, r.FormValue("root"), username, message, linkAddr, parent, bRoot, bSticky)
 	//mail.comments.InsertComment(id, username, message, username+"-"+recipient, bRoot, bSticky)
+
+	link := "/mail/" + r.FormValue("root") + "/" + id
+	mail.notifications.InsertNotification(data.Notification{Sender: username, Reciever: replyTo, CommentLink: link, Created: time.Now()})
 
 	log.Println("printing mail comments from:", r.FormValue("root"))
 
