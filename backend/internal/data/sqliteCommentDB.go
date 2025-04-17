@@ -11,6 +11,19 @@ import (
 	_ "github.com/mattn/go-sqlite3" // Import go-sqlite3 library
 )
 
+/*  Database representation of a Comment
+"id" TEXT,
+"root_id" TEXT,
+"user" TEXT,
+"message" TEXT,
+"picture" TEXT,
+"link" TEXT,
+"parent" TEXT,
+"root" BIT,
+"sticky" BIT,
+"created_at" DATETIME
+*/
+
 type Comment struct {
 	Id       string    // the UUID of this comment
 	RootId   string    // the UUID of this comment's root comment
@@ -18,6 +31,7 @@ type Comment struct {
 	Message  string    // The comment message
 	Picture  string    // The picture uploaded with this comment
 	Link     string    // The link uploaded with this comment
+	Parent   string    // The parent Id
 	Root     bool      // Is this a root comment?
 	Sticky   bool      // Is this a 'sticky' or 'pinned' comment?
 	Editable bool      // not saved in database! Derived from user level, giving edit rights.
@@ -143,9 +157,9 @@ func (db *SqliteCommentDB) GetRootMail(username string) *[]Comment {
 	log.Println("root mail:")
 	for rows.Next() {
 		rows.Scan(&id, &user, &message, &picture, &link, &parent, &root, &sticky, &created)
-		log.Println("Comment ID:", id, " Message:", message, "Parent", parent)
+		log.Println("Comment ID:", id, " Message:", message, "Parent:", parent)
 		editable = (username == user)
-		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created})
+		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Parent: parent, Root: root, Sticky: sticky, Editable: editable, Created: created})
 	}
 
 	return &comments
@@ -177,7 +191,7 @@ func (db *SqliteCommentDB) GetComment(id string) *Comment {
 	for rows.Next() {
 		rows.Scan(&id, &user, &message, &picture, &link, &parent, &root, &sticky, &created)
 		log.Println("Comment ID:", id, " Message:", message, "Parent", parent, "Sticky", sticky)
-		comment = Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created}
+		comment = Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Parent: parent, Root: root, Sticky: sticky, Editable: editable, Created: created}
 	}
 	return &comment
 }
@@ -218,7 +232,7 @@ func (db *SqliteCommentDB) GetRootComments(username string) *[]Comment {
 				comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
 			}
 		*/
-		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created})
+		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Parent: parent, Root: root, Sticky: sticky, Editable: editable, Created: created})
 	}
 	//comments = append(stickyComments, comments...)
 
@@ -271,7 +285,7 @@ func (db *SqliteCommentDB) GetCommentsFromTo(username string, startIdx, endIdx i
 					comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
 				}
 			*/
-			comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created})
+			comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Parent: parent, Root: root, Sticky: sticky, Editable: editable, Created: created})
 		}
 		row++
 	}
@@ -317,7 +331,7 @@ func (db *SqliteCommentDB) GetMailComments(parentID string, username string) *[]
 		rows.Scan(&id, &user, &message, &picture, &link, &parent, &root, &sticky, &created)
 		log.Println("Comment ID:", id, " Message:", message, "Parent", parent)
 		editable = (username == user)
-		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created})
+		comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Parent: parent, Root: root, Sticky: sticky, Editable: editable, Created: created})
 	}
 
 	return &comments
@@ -366,16 +380,16 @@ func (db *SqliteCommentDB) GetChildComments(parentID string, username string) *[
 		log.Println("Comment ID:", id, " Message:", message, " Parent", parent, " Editable:", editable)
 		if parent == parentID {
 			log.Println("found parent comment")
-			comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created})
+			comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Parent: parent, Root: root, Sticky: sticky, Editable: editable, Created: created})
 		} else if root {
 			log.Println("found root comment")
-			rootComment = Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created}
+			rootComment = Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Parent: parent, Root: root, Sticky: sticky, Editable: editable, Created: created}
 
 			//comments = append(comments, Comment{Id: id, User: user, Message: message, Picture: picture, Root: root, Sticky: sticky, Editable: editable, Created: created})
 
 		} else {
 			log.Println("adding ", id, " to parent ", parent)
-			addCommentToSublist(&comments, parent, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Root: root, Sticky: sticky, Editable: editable, Created: created})
+			addCommentToSublist(&comments, parent, Comment{Id: id, User: user, Message: message, Picture: picture, Link: link, Parent: parent, Root: root, Sticky: sticky, Editable: editable, Created: created})
 		}
 	}
 

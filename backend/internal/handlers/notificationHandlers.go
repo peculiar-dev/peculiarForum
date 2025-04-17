@@ -34,6 +34,8 @@ func (notification *NotificationHandler) IndexHandler(w http.ResponseWriter, r *
 	var data NotificationIndexData
 	data.Notifications = notification.notifications.GetNotifications(username)
 	data.User = notification.users.GetUser(username)
+	//update the user's last login time/date so we know if notifications are new
+	notification.users.UpdateUser(data.User)
 	//currentNotifications := notification.notifications.GetNotifications(username)
 
 	//tmpl := template.Must(template.ParseFiles("templates/header.html", "templates/index.html"))

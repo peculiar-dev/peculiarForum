@@ -88,7 +88,7 @@
             <input type = "hidden" name = "parent" value = "{{ $replyBoxId }}" />
             <input type = "hidden" name = "root" class="root_input" value = "" />
             <input type = "hidden" name = "source" value = "mail" />
-            <input type = "hidden" name = "replyTo" value = "{{ $rootComment.User }}" />
+            <input type = "hidden" name = "replyTo" value = "{{ $rootComment.Parent }}" />
            <!-- <input type="textarea" name="comment" id="comment" placeholder="Write your reply here..."> -->
             <textarea name="comment" id="comment" placeholder="Write your reply here..." rows="4" cols="50"></textarea>
             <br>Link Address:<input type="text" name="linkAddr"> 

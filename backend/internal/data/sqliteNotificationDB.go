@@ -115,6 +115,22 @@ func (db *SqliteNotificationDB) LoadTestNotifications() {
 
 }
 
+func (db *SqliteNotificationDB) HasNotifications(username string, since time.Time) bool {
+
+	rows, err := db.database.Query(`SELECT sender, commentLink, created_at
+	FROM notification
+	WHERE reciever = ?
+	AND created_at > ?
+	ORDER BY created_at DESC;`, username, since)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if rows.Next() {
+		return true
+	}
+	return false
+}
+
 func (db *SqliteNotificationDB) GetNotifications(username string) *[]Notification {
 
 	var notifications []Notification

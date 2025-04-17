@@ -86,8 +86,12 @@ func (ch *CommentHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 		ch.comments.EditComment(rootComment.Id, rootComment.Message, rootComment.Link, "root", true, rootComment.Sticky, time.Now())
 	}
 
-	link := "/comment/" + r.FormValue("root") + "/" + id
-	ch.notifications.InsertNotification(data.Notification{Sender: username, Reciever: replyTo, CommentLink: link, Created: time.Now()})
+	// Don't send notifications to yourself.
+	if username != replyTo {
+		link := "/comment/" + r.FormValue("root") + "/" + id
+		ch.notifications.InsertNotification(data.Notification{Sender: username, Reciever: replyTo, CommentLink: link, Created: time.Now()})
+	}
+
 	/*
 		AddCommentToSublist(&comments, parent, comment)
 		log.Println("added to sublist")

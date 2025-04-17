@@ -224,7 +224,7 @@ func (db *SqliteUserDB) UpdateUser(user *User) {
 
 func (db *SqliteUserDB) LoadTestUsers() {
 
-	db.InsertUser(&User{Username: "test", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 100, Email: ""})
+	db.InsertUser(&User{Username: "test", Created: time.Now(), LastLogin: time.Now().Add(-3 * time.Hour), Theme: "light", Level: 100, Email: "coredumpproject@gmail.com"})
 	db.InsertUser(&User{Username: "test2", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 0, Email: ""})
 	db.InsertUser(&User{Username: "test3", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 0, Email: ""})
 	db.InsertUser(&User{Username: "test4", Created: time.Now(), LastLogin: time.Now(), Theme: "light", Level: 0, Email: ""})

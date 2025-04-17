@@ -2,9 +2,13 @@ package main
 
 import (
 	"context"
+	"io"
 	"os"
 	"peculiarity/internal/data"
+	"peculiarity/internal/email"
 	"peculiarity/internal/handlers"
+	"strconv"
+	"strings"
 
 	"fmt"
 	"log"
@@ -33,6 +37,10 @@ type IndexData struct {
 var commentsdb data.Commentdb
 var userdb data.Userdb
 var notificationdb data.Notificationdb
+var emailConnector email.EmailConnector
+var updateHour int // the hour of the day when daily updates will run.
+var notificationBody string
+var chatBody string
 
 var stopProcess chan bool
 
@@ -53,9 +61,26 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func chatInvite(w http.ResponseWriter, r *http.Request) {
+	username := r.Header.Get("X-User")
+	recipient := r.FormValue("user")
+
+	inviteUser := userdb.GetUser(recipient)
+	err := emailConnector.SendNotification(inviteUser.Email, username+" invited you to chat: "+chatBody)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
 func init() {
 
-	// handle command-line arguments
+	updateHour = 19 // default 7pm
+
+	loadConfig() // load config from file
+
+	// handle commandline arguments (overrides commandline )
 	if len(os.Args) > 1 {
 		for i, arg := range os.Args[1:] {
 			if arg == "-debug" {
@@ -70,11 +95,28 @@ func init() {
 				port = ":" + os.Args[i+2]
 				log.Println("setting port to:", port)
 			}
+			if arg == "-uHour" { // update hour
+				updateHour, err := strconv.Atoi(os.Args[i+2])
+				if err != nil {
+					log.Println("hour set by -uHour must be a number between 0 and 24")
+					os.Exit(0)
+				}
+				if updateHour > 24 {
+					log.Println("hour set by -uHour in command line must not be greater than 24")
+					os.Exit(0)
+				}
+				if updateHour < 0 {
+					log.Println("hour set by -uHour in command line must not be less than 0")
+					os.Exit(0)
+				}
+				log.Println("setting update Hour to:", updateHour)
+			}
 			if arg == "-h" || arg == "-help" {
 				fmt.Println(" -h or -help         - This help message.")
 				fmt.Println(" -debug              - Sets debug mode to true, default false.")
 				fmt.Println(" -init               - Sets initalize mode to true, default false.")
 				fmt.Println(" -port <port number> - Sets the port number to <port number>, default: 8080")
+				fmt.Println(" -uHour <hour from 0-24")
 				os.Exit(0)
 			}
 
@@ -107,9 +149,120 @@ func init() {
 	}
 
 	uuidWithHyphen := uuid.New()
-	fmt.Println(uuidWithHyphen)
+	log.Println(uuidWithHyphen)
 
 	//	handlers.Directory = "./downloads/"
+}
+
+func loadConfig() {
+	filePath := "pforum.conf"
+	var emailType, password, emailAddress, smtpHost string
+
+	file, err := os.Open(filePath)
+	if err != nil {
+		log.Println("error opening config file:", err)
+		os.Exit(0)
+	}
+	defer file.Close()
+
+	content, err := io.ReadAll(file)
+	if err != nil {
+		log.Println("error reading config file:", err)
+		os.Exit(0)
+	}
+	lines := strings.Split(string(content), "\n")
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 {
+			setting := strings.TrimSpace(parts[0])
+			value := strings.TrimSpace(parts[1])
+
+			switch setting {
+			case "debug":
+				debug, err = strconv.ParseBool(value)
+			case "init":
+				initialize, err = strconv.ParseBool(value)
+			case "port":
+				port = value
+			case "uHour":
+				updateHour, err := strconv.Atoi(value)
+				if err != nil {
+					log.Println("hour set by -uHour must be a number between 0 and 24")
+					os.Exit(0)
+				}
+				if updateHour > 24 {
+					log.Println("hour set by -uHour in command line must not be greater than 24")
+					os.Exit(0)
+				}
+				if updateHour < 0 {
+					log.Println("hour set by -uHour in command line must not be less than 0")
+					os.Exit(0)
+				}
+			case "emailType":
+				emailType = value
+			case "password":
+				password = value
+			case "emailAddress":
+				emailAddress = value
+			case "smtpHost":
+				smtpHost = value
+			case "notificationBody":
+				notificationBody = value
+			case "chatBody":
+				chatBody = value
+			default:
+				log.Printf("invalid setting in pforum.conf. Setting: %s, value: %s. setting not found.", setting, value)
+				os.Exit(0)
+			}
+			if err != nil {
+				log.Printf("invalid setting in pforum.conf. Setting: %s, value: %s caused error: %s /n", setting, value, err.Error())
+				os.Exit(0)
+			}
+		}
+	}
+	if emailType == "SMTP" {
+		emailConnector = email.NewEmailSMTP(smtpHost, emailAddress, password)
+	}
+
+}
+
+func dailyUpdates() {
+
+	/*
+		password = "zcqnhaqfpschjmmq" // generated 16 digits app password
+		from     = "como.peculiarity@gmail.com"
+		smtpHost = "smtp.gmail.com"
+	*/
+
+	//emailConnector = email.NewEmailSMTP("smtp.gmail.com", "como.peculiarity@gmail.com", "zcqnhaqfpschjmmq")
+
+	for {
+		now := time.Now()
+		tomorrow := time.Date(now.Year(), now.Month(), now.Day()+1, updateHour, 0, 0, 0, time.UTC)
+		fmt.Println("Daily updates will run tomorrow: ", tomorrow)
+		timeTo := tomorrow.Sub(now)
+
+		/*email each user who has notifications newer than their last login*/
+		//fmt.Println("has updates:", notificationdb.HasNotifications("test", time.Now().Add(3*time.Hour)))
+
+		users := userdb.GetUsers()
+
+		for _, user := range *users {
+			if notificationdb.HasNotifications(user.Username, user.LastLogin) && user.Email != "" {
+				log.Println("Sending email to user: " + user.Username + " email: " + user.Email)
+				//emailConnector.SendNotification(user.Email, "https://comopeculiarity.org/notifications")
+				emailConnector.SendNotification(user.Email, notificationBody)
+			}
+		}
+
+		time.Sleep(timeTo)
+	}
 }
 
 func main() {
@@ -131,6 +284,7 @@ func main() {
 	http.Handle("/downloads/", http.StripPrefix("/downloads/", http.FileServer(http.Dir("./downloads"))))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	http.HandleFunc("/healthcheck", healthCheck)
+	http.HandleFunc("/chatInvite", chatInvite)
 
 	//comment index
 
@@ -176,6 +330,9 @@ func main() {
 
 	defer commentsdb.Getdb().Close()
 	defer userdb.Getdb().Close()
+	defer notificationdb.Getdb().Close()
+
+	go dailyUpdates()
 
 	go func() {
 		if err := http.ListenAndServe(port, nil); err != nil && err != http.ErrServerClosed {

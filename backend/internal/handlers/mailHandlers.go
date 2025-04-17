@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"peculiarity/internal/data"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -72,18 +73,26 @@ func (mail *MailHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 		username = "test"
 	}
 
+	fmt.Printf("replyTo before stripping: %s\n", replyTo)
+	//if the username is first in ID field, remove it.
+	//else, it's second, so remove from there.
+	if strings.Count(replyTo, username+"-") == 1 {
+		replyTo = strings.Replace(replyTo, username+"-", "", 1)
+	} else {
+		replyTo = strings.Replace(replyTo, "-"+username, "", 1)
+	}
+
 	//root := r.FormValue("root") // make boolean?
 	//sticky := r.FormValue("sticky") // make boolean?
 
 	parent = parent[10:] // strip javascript identifier
 	//comment := Comment{Id: id, User: username, Message: message, Root: bRoot, Sticky: bSticky, Sublist: nil}
-
-	fmt.Printf("parent: %s\n", parent)
 	//fmt.Printf("comment:%v\n", comment)
 
 	mail.comments.InsertComment(id, r.FormValue("root"), username, message, linkAddr, parent, bRoot, bSticky)
 	//mail.comments.InsertComment(id, username, message, username+"-"+recipient, bRoot, bSticky)
 
+	fmt.Printf("Adding mail reply Notificaton: replyTo: %s, From Username: %s\n", replyTo, username)
 	link := "/mail/" + r.FormValue("root") + "/" + id
 	mail.notifications.InsertNotification(data.Notification{Sender: username, Reciever: replyTo, CommentLink: link, Created: time.Now()})
 
@@ -130,6 +139,10 @@ func (mail *MailHandler) IndexAddHandler(w http.ResponseWriter, r *http.Request)
 
 	//mail.comments.InsertComment(id, username, message, parent, bRoot, bSticky)
 	mail.comments.InsertComment(id, "", username, message, linkAddr, username+"-"+recipient, bRoot, bSticky)
+
+	fmt.Printf("Adding mail creation Notificaton: recipient: %s, From Username: %s\n", recipient, username)
+	link := "/mail/" + r.FormValue("root") + "/" + id
+	mail.notifications.InsertNotification(data.Notification{Sender: username, Reciever: recipient, CommentLink: link, Created: time.Now()})
 
 	/*
 		log.Println("printing mail comments from:", r.FormValue("root"))
