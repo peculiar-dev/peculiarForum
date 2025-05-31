@@ -4,11 +4,13 @@ import (
 	"context"
 	"io"
 	"os"
+	"os/signal"
 	"peculiarity/internal/data"
 	"peculiarity/internal/email"
 	"peculiarity/internal/handlers"
 	"strconv"
 	"strings"
+	"syscall"
 
 	"fmt"
 	"log"
@@ -42,7 +44,7 @@ var updateHour int // the hour of the day when daily updates will run.
 var notificationBody string
 var chatBody string
 
-var stopProcess chan bool
+var stopProcess chan os.Signal
 
 //var comments []Comment
 
@@ -132,8 +134,6 @@ func init() {
 	userdb.Setdb(commentsdb.Getdb()) // set the userdb to the same sqlite db instance
 	if initialize {
 		userdb.CreateUserTable()
-	}
-	if debug {
 		userdb.LoadTestUsers()
 		log.Default().Println(userdb.GetUsers())
 	}
@@ -142,8 +142,6 @@ func init() {
 	notificationdb.Setdb(commentsdb.Getdb()) // set the notification db to the same sqline db instance
 	if initialize {
 		notificationdb.CreateNotificationTable()
-	}
-	if debug {
 		notificationdb.LoadTestNotifications()
 		log.Default().Println(notificationdb.GetNotifications("test"))
 	}
@@ -232,6 +230,18 @@ func loadConfig() {
 
 }
 
+func sendEmail() {
+	users := userdb.GetUsers()
+
+	for _, user := range *users {
+		if notificationdb.HasNotifications(user.Username, user.LastLogin) && user.Email != "" {
+			log.Println("Sending email to user: " + user.Username + " email: " + user.Email)
+			//emailConnector.SendNotification(user.Email, "https://comopeculiarity.org/notifications")
+			emailConnector.SendNotification(user.Email, notificationBody)
+		}
+	}
+}
+
 func dailyUpdates() {
 
 	/*
@@ -251,23 +261,17 @@ func dailyUpdates() {
 		/*email each user who has notifications newer than their last login*/
 		//fmt.Println("has updates:", notificationdb.HasNotifications("test", time.Now().Add(3*time.Hour)))
 
-		users := userdb.GetUsers()
-
-		for _, user := range *users {
-			if notificationdb.HasNotifications(user.Username, user.LastLogin) && user.Email != "" {
-				log.Println("Sending email to user: " + user.Username + " email: " + user.Email)
-				//emailConnector.SendNotification(user.Email, "https://comopeculiarity.org/notifications")
-				emailConnector.SendNotification(user.Email, notificationBody)
-			}
-		}
+		sendEmail()
 
 		time.Sleep(timeTo)
 	}
+
 }
 
 func main() {
 
-	stopProcess = make(chan bool)
+	stopProcess = make(chan os.Signal, 1)
+	signal.Notify(stopProcess, os.Interrupt, syscall.SIGTERM)
 
 	server := &http.Server{
 		Addr: port,
@@ -328,26 +332,32 @@ func main() {
 
 	log.Println("Starting server on port: " + port)
 
-	defer commentsdb.Getdb().Close()
-	defer userdb.Getdb().Close()
-	defer notificationdb.Getdb().Close()
-
 	go dailyUpdates()
 
 	go func() {
-		if err := http.ListenAndServe(port, nil); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen error: %s\n", err)
+		<-stopProcess
+		log.Println("Shutting Down")
+
+		shutdownCTX, shutdownRel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer shutdownRel()
+
+		if err := server.Shutdown(shutdownCTX); err != nil {
+			log.Fatalf("HTTP shutdown error: %v", err)
 		}
+		log.Println("HTTP Shutdown")
+
+		log.Println("Shutting Down DB Connections")
+		commentsdb.Getdb().Close()
+		userdb.Getdb().Close()
+		notificationdb.Getdb().Close()
+		log.Println("DB Connections Shutdown")
+
+		os.Exit(0)
 	}()
 
-	stopProcess <- true
-
-	log.Println("Shutting Down")
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := server.Shutdown(ctx); err != nil {
-		log.Fatalf("HTTP shutdown error: %v", err)
+	log.Println("Starting http Server.")
+	if err := http.ListenAndServe(port, nil); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("listen error: %s\n", err)
 	}
 
 }

@@ -88,7 +88,7 @@ func (ch *CommentHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Don't send notifications to yourself.
 	if username != replyTo {
-		link := "/comment/" + r.FormValue("root") + "/" + id
+		link := "/comment/" + r.FormValue("root") + "/" + id + "#" + id
 		ch.notifications.InsertNotification(data.Notification{Sender: username, Reciever: replyTo, CommentLink: link, Created: time.Now()})
 	}
 

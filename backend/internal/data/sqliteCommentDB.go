@@ -74,12 +74,14 @@ func (db *SqliteCommentDB) InitDB(initialize, debug bool) {
 	if debug {
 		var error error
 		sqliteDatabase, error = sql.Open("sqlite3", "./sqlite-database.db") // Open the local File
+		log.Println("Debug database loaded.")
 		if error != nil {
 			log.Fatal(error.Error())
 		}
 	} else {
 		var error error
 		sqliteDatabase, error = sql.Open("sqlite3", "/etc/nginx/conf.d/sqlite-database.db") // Open the container file
+		log.Println("Production database loaded.")
 		if error != nil {
 			log.Fatal(error.Error())
 		}
@@ -87,11 +89,10 @@ func (db *SqliteCommentDB) InitDB(initialize, debug bool) {
 	//defer sqliteDatabase.Close() // Defer Closing the database
 
 	db.database = sqliteDatabase
+	sqliteDatabase.SetMaxOpenConns(1)
 
 	if initialize {
 		db.CreateCommentTable()
-	}
-	if debug {
 		db.LoadTestComments()
 	}
 

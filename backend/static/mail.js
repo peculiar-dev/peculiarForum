@@ -168,6 +168,8 @@
         });
     });
 
+    window.scrollTo(0, document.body.scrollHeight);
+
     }
 
     document.addEventListener('htmx:afterSettle',function(evt){

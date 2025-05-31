@@ -125,10 +125,8 @@ func (db *SqliteNotificationDB) HasNotifications(username string, since time.Tim
 	if err != nil {
 		log.Fatal(err)
 	}
-	if rows.Next() {
-		return true
-	}
-	return false
+	defer rows.Close()
+	return rows.Next()
 }
 
 func (db *SqliteNotificationDB) GetNotifications(username string) *[]Notification {
