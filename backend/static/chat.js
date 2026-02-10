@@ -15,6 +15,12 @@ websocket.onopen = function(evt) { onOpen(evt) };
 websocket.onmessage = function(evt) { onMessage(evt) };
 websocket.onerror = function(evt) { onError(evt) };
 
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        sendMessage();
+    }
+});
+
 function sendMessage() {
     
     websocket.send("<a href='/user/"+username+"'> <img class='user-icon' src='/downloads/"+username+"/_user_icon.png' alt='/user/"+username+"' ></a>" +username + ": " + textField.value);

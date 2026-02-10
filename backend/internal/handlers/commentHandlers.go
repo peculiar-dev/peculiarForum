@@ -77,7 +77,8 @@ func (ch *CommentHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("parent: %s\n", parent)
 	//fmt.Printf("comment:%v\n", comment)
 
-	ch.comments.InsertComment(id, r.FormValue("root"), username, message, linkAddr, parent, bRoot, bSticky)
+	//ch.comments.InsertComment(id, r.FormValue("root"), username, message, linkAddr, parent, bRoot, bSticky)
+	ch.comments.InsertComment(data.Comment{Id: id, RootId: r.FormValue("root"), User: username, Message: message, Link: linkAddr, Parent: parent, Root: bRoot, Sticky: bSticky})
 	/* db.InsertNotification(Notification{Sender: "test2", Reciever: "test", CommentLink: "/comment/id-1/id-2", Created: time.Now()})
 	 */
 

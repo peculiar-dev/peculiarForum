@@ -289,7 +289,7 @@ func (userHandler *UserHandler) UploadPhotoHandler(w http.ResponseWriter, r *htt
 		}
 	}
 
-	log.Println("in upload Handler")
+	log.Println("in upload photo Handler")
 	log.Println("User:" + username)
 
 	if username == "" {

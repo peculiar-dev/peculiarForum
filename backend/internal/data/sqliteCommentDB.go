@@ -102,31 +102,32 @@ func (db *SqliteCommentDB) InitDB(initialize, debug bool) {
 
 func (db *SqliteCommentDB) LoadTestComments() {
 
-	db.InsertComment("id-1", "", "test", "test message 1", "", "root", true, false)
-	db.InsertComment("id-2", "id-1", "test", "test message 2", "", "id-1", false, false)
-	db.InsertComment("id-3", "id-1", "test", "test message 3", "", "id-1", false, false)
-	db.InsertComment("id-4", "id-1", "test2", "test message 4", "", "id-3", false, false)
-	db.InsertComment("id-5", "", "test2", "test message 5", "", "root", true, false)
-	db.InsertComment("id-6", "id-5", "test", "test message 6", "", "id-5", false, false)
-	db.InsertComment("id-7", "id-5", "test2", "test message 7", "", "id-5", false, false)
-	db.InsertComment("id-8", "", "test", "test mail message 1", "", "test2-test", true, false)
-	db.InsertComment("id-9", "", "test2", "test mail message 2", "", "test-test2", true, false)
-	db.InsertComment("id-10", "", "test", "test message 10", "", "root", true, false)
-	db.InsertComment("id-11", "", "test", "test message 11", "", "root", true, false)
-	db.InsertComment("id-12", "", "test", "test message 12", "", "root", true, false)
-	db.InsertComment("id-13", "", "test", "test message 13", "", "root", true, false)
-	db.InsertComment("id-14", "", "test", "test message 14", "", "root", true, false)
-	db.InsertComment("id-15", "", "test", "test message 15", "", "root", true, false)
-	db.InsertComment("id-16", "", "test", "test message 16", "", "root", true, false)
-	db.InsertComment("id-17", "", "test", "test message 17", "", "root", true, false)
-	db.InsertComment("id-18", "", "test", "test message 18", "", "root", true, false)
-	db.InsertComment("id-19", "", "test", "test message 19", "", "root", true, false)
-	db.InsertComment("id-20", "", "test", "test message 20", "", "root", true, false)
-	db.InsertComment("id-21", "", "test", "test message 21", "", "root", true, false)
-	db.InsertComment("id-22", "", "test", "test message 22", "", "root", true, false)
-	db.InsertComment("id-23", "", "test", "test message 23", "", "root", true, false)
-	db.InsertComment("id-24", "", "test", "test message 24", "", "root", true, false)
-	db.InsertComment("id-25", "", "test", "test message 25", "", "root", true, false)
+	//db.InsertComment("id-1", "", "test", "test message 1", "", "root", true, false)
+	db.InsertComment(Comment{Id: "id-1", RootId: "", User: "test", Message: "test message 1", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-2", RootId: "id-1", User: "test", Message: "test message 2", Picture: "", Link: "", Parent: "id-1", Root: false, Sticky: false})
+	db.InsertComment(Comment{Id: "id-3", RootId: "id-1", User: "test", Message: "test message 3", Picture: "", Link: "", Parent: "id-1", Root: false, Sticky: false})
+	db.InsertComment(Comment{Id: "id-4", RootId: "id-1", User: "test2", Message: "test message 4", Picture: "", Link: "", Parent: "id-3", Root: false, Sticky: false})
+	db.InsertComment(Comment{Id: "id-5", RootId: "", User: "test2", Message: "test message 5", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-6", RootId: "id-5", User: "test", Message: "test message 6", Picture: "", Link: "", Parent: "id-5", Root: false, Sticky: false})
+	db.InsertComment(Comment{Id: "id-7", RootId: "id-5", User: "test2", Message: "test message 7", Picture: "", Link: "", Parent: "id-5", Root: false, Sticky: false})
+	db.InsertComment(Comment{Id: "id-8", RootId: "", User: "test", Message: "test mail message 1", Picture: "", Link: "", Parent: "test2-test", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-9", RootId: "", User: "test2", Message: "test mail message 2", Picture: "", Link: "", Parent: "test-test2", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-10", RootId: "", User: "test", Message: "test message 10", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-11", RootId: "", User: "test", Message: "test message 11", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-12", RootId: "", User: "test", Message: "test message 12", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-13", RootId: "", User: "test", Message: "test message 13", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-14", RootId: "", User: "test", Message: "test message 14", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-15", RootId: "", User: "test", Message: "test message 15", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-16", RootId: "", User: "test", Message: "test message 16", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-17", RootId: "", User: "test", Message: "test message 17", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-18", RootId: "", User: "test", Message: "test message 18", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-19", RootId: "", User: "test", Message: "test message 19", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-20", RootId: "", User: "test", Message: "test message 20", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-21", RootId: "", User: "test", Message: "test message 21", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-22", RootId: "", User: "test", Message: "test message 22", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-23", RootId: "", User: "test", Message: "test message 23", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-24", RootId: "", User: "test", Message: "test message 24", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
+	db.InsertComment(Comment{Id: "id-25", RootId: "", User: "test", Message: "test message 25", Picture: "", Link: "", Parent: "root", Root: true, Sticky: false})
 
 	//test child comment logic.
 	db.GetChildComments("id-1", "test")
@@ -224,7 +225,7 @@ func (db *SqliteCommentDB) GetRootComments(username string) *[]Comment {
 	log.Println("root comments:")
 	for rows.Next() {
 		rows.Scan(&id, &user, &message, &picture, &link, &parent, &root, &sticky, &created)
-		log.Println("Comment ID:", id, " Message:", message, "Parent", parent, "Sticky", sticky)
+		log.Println("Comment ID:", id, " Message:", message, "Parent", parent, "Sticky", sticky, "Picture", picture)
 		editable = (username == user)
 		/*
 			if sticky {
@@ -277,7 +278,7 @@ func (db *SqliteCommentDB) GetCommentsFromTo(username string, startIdx, endIdx i
 	for rows.Next() {
 		if row >= startIdx && row <= endIdx {
 			rows.Scan(&id, &user, &message, &picture, &link, &parent, &root, &sticky, &created)
-			log.Println("Comment ID:", id, " timestamp", created.Format("2006-01-02 15:04:05"), " Message:", message, " link:", link, "Parent", parent, "sticky:", sticky)
+			log.Println("Comment ID:", id, " timestamp", created.Format("2006-01-02 15:04:05"), " Message:", message, " link:", link, "Parent", parent, "sticky:", sticky, "Picture", picture)
 			editable = (username == user)
 			/*
 				if sticky {
@@ -434,7 +435,9 @@ func (db *SqliteCommentDB) CreateCommentTable() {
 	log.Println("comment table created")
 }
 
-func (db *SqliteCommentDB) InsertComment(id, rootID, user, message, link, parent string, root bool, sticky bool) {
+// func (db *SqliteCommentDB) InsertComment(id, rootID, user, message, link, parent string, root bool, sticky bool) {
+func (db *SqliteCommentDB) InsertComment(comment Comment) {
+
 	currentTime := time.Now()
 
 	//message = strings.Replace(message, "\n", "<br>", -1)
@@ -446,7 +449,8 @@ func (db *SqliteCommentDB) InsertComment(id, rootID, user, message, link, parent
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	_, err = statement.Exec(id, rootID, user, message, "", link, parent, root, sticky, currentTime)
+	//_, err = statement.Exec(id, rootID, user, message, "", link, parent, root, sticky, currentTime)
+	_, err = statement.Exec(comment.Id, comment.RootId, comment.User, comment.Message, comment.Picture, comment.Link, comment.Parent, comment.Root, comment.Sticky, currentTime)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

@@ -89,7 +89,8 @@ func (mail *MailHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	//comment := Comment{Id: id, User: username, Message: message, Root: bRoot, Sticky: bSticky, Sublist: nil}
 	//fmt.Printf("comment:%v\n", comment)
 
-	mail.comments.InsertComment(id, r.FormValue("root"), username, message, linkAddr, parent, bRoot, bSticky)
+	//mail.comments.InsertComment(id, r.FormValue("root"), username, message, linkAddr, parent, bRoot, bSticky)
+	mail.comments.InsertComment(data.Comment{Id: id, RootId: r.FormValue("root"), User: username, Message: message, Link: linkAddr, Parent: parent, Root: bRoot, Sticky: bSticky})
 	//mail.comments.InsertComment(id, username, message, username+"-"+recipient, bRoot, bSticky)
 
 	fmt.Printf("Adding mail reply Notificaton: replyTo: %s, From Username: %s\n", replyTo, username)
@@ -138,7 +139,8 @@ func (mail *MailHandler) IndexAddHandler(w http.ResponseWriter, r *http.Request)
 	//fmt.Printf("comment:%v\n", comment)
 
 	//mail.comments.InsertComment(id, username, message, parent, bRoot, bSticky)
-	mail.comments.InsertComment(id, "", username, message, linkAddr, username+"-"+recipient, bRoot, bSticky)
+	//mail.comments.InsertComment(id, "", username, message, linkAddr, username+"-"+recipient, bRoot, bSticky)
+	mail.comments.InsertComment(data.Comment{Id: id, RootId: "", User: username, Message: message, Link: linkAddr, Parent: username + "-" + recipient, Root: bRoot, Sticky: bSticky})
 
 	fmt.Printf("Adding mail creation Notificaton: recipient: %s, From Username: %s\n", recipient, username)
 	link := "/mail/" + r.FormValue("root") + "/" + id

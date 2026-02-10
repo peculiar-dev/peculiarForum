@@ -284,7 +284,7 @@ func main() {
 	userHandler := handlers.NewUserHandler(userdb)
 	chatHandler := handlers.NewChatHandler(userdb)
 
-	http.Handle("/user/", http.StripPrefix("/user/", http.FileServer(http.Dir("./downloads/user"))))
+	//http.Handle("/user/", http.StripPrefix("/user/", http.FileServer(http.Dir("./downloads/user"))))
 	http.Handle("/downloads/", http.StripPrefix("/downloads/", http.FileServer(http.Dir("./downloads"))))
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	http.HandleFunc("/healthcheck", healthCheck)
@@ -297,6 +297,7 @@ func main() {
 	http.HandleFunc("/indexAddComment", indexhandler.AddHandler)
 	http.HandleFunc("/indexEditComment", indexhandler.EditHandler)
 	http.HandleFunc("/indexUpload", indexhandler.UploadHandler)
+	http.HandleFunc("/indexSubPicUpload", indexhandler.NewPostUploadHandler)
 
 	//mail index
 

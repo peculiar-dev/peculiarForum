@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"peculiarity/internal/data"
+	"time"
 	"unicode/utf8"
 
 	"github.com/gorilla/websocket"
@@ -70,6 +71,24 @@ func (chat *ChatHandler) ChatSocket(w http.ResponseWriter, r *http.Request) {
 		return equalASCIIFold(u.Host, r.Host)
 	}
 	c, err := upgrader.Upgrade(w, r, nil)
+
+	c.SetPongHandler(func(appData string) error {
+		log.Println("pong", appData)
+		return nil
+	})
+
+	go func() {
+		for {
+			time.Sleep(10 * time.Second)
+			log.Println("ping")
+			err := c.WriteMessage(websocket.PingMessage, nil)
+			if err != nil {
+				log.Println("Failed to send ping:", err)
+				return
+			}
+		}
+	}()
+
 	var user ChatUser
 	user.Connection = c
 	chat.clients = append(chat.clients, &user)

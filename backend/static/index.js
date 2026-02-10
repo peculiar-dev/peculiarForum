@@ -1,5 +1,7 @@
     var current_comment = "";
+    var current_image = "";
     var current_root = window.location.pathname.split('/')[2];
+
    /*
     document.addEventListener('htmx:afterSettle',function(evt){
         init(); 
@@ -163,8 +165,11 @@
 
     // make post box hidden on each HTMX refresh
     const postBox = document.getElementById("post-box");
-    postBox.style.display = 'none';
-
+    if (current_image === "") {
+        postBox.style.display = 'none';
+    } else {
+        postBox.style.display = 'block';    
+    }
     }
 
     // JavaScript to handle post button actions
@@ -180,3 +185,16 @@
             }
         });
     });
+
+    //handle after submit for post 
+    function afterSubmit(e,form) {
+        if(e.detail.successful) form.reset();
+        console.log("after submit triggered");
+        current_image = "";
+        const postPic = document.getElementById("post-pic");
+        if (postPic) {
+            postPic.src = "";
+        }
+        picInputTemp = document.getElementById("picture");
+        picInputTemp.value = current_image;
+    };

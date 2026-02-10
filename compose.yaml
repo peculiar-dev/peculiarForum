@@ -2,6 +2,11 @@ services:
   proxy:
     image: nginx
     restart: "unless-stopped"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "10"
     volumes:
       - type: bind
         source: ./proxy/nginx.conf
@@ -19,7 +24,7 @@ services:
         source: ./proxy/privkey.pem
         target: /etc/nginx/conf.d/privkey.pem
         read_only: true
-        
+      - ./backend/downloads/user:/usr/share/nginx/html/user
     ports:
       - 80:80
       - 443:443

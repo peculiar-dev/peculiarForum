@@ -34,10 +34,34 @@
     -->
 
     <button class="post-button" >Post</button>
-            <!-- Reply box that will show/hide when reply button is clicked -->
+            <!-- Post box that will show/hide when post button is clicked -->
             <div id="post-box" class="post-box">
                 <div class="instructions">Enter your post below:</div>
-                <form hx-swap="innerHTML" hx-target="#comment-list" hx-post="/indexAddComment"> 
+                {{block "sub-pic-element" .}} 
+                    <div id="post-img-target">
+                        {{if ne $.CurrentImage ""}}
+                            <span><img class="post-pic" id="post-pic" src="{{$.CurrentImage}}" > <br> </span>
+                            <script>
+                                console.log("running script to update postBox and current Image")
+			                    current_image = "{{ $.CurrentImage }}"
+                                console.log("current image is:", current_image)
+                                postBoxTemp = document.getElementById("post-box");
+                                postBoxTemp.style.display = 'none';
+                                picInputTemp = document.getElementById("picture");
+                                picInputTemp.value = current_image;
+    		                </script>
+                        {{end}}
+                        <button class="pic-button" data-pic-target="subPic">Upload Image for Submission</button>
+                        <form style="display: none;" class="form-horizontal" id="subPic" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#post-img-target" hx-post="/indexSubPicUpload" >    
+                        <div class="input-group">
+                        <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitForm('subPic',event)"> 
+                        <button type="submit" style="display: none;">Upload</button>
+                    </div>
+                    </form>
+                    </div>
+                {{end}}
+                <form hx-swap="innerHTML" hx-target="#comment-list" hx-post="/indexAddComment" hx-on::after-request="afterSubmit(event, this)"> 
+                    <input type = "hidden" name = "picture" id="picture" value = "{{$.CurrentImage}}" />
                     <textarea name="comment" id="comment" placeholder="Write your comment here..." rows="4" cols="50"></textarea>
                     <input type = "hidden" name = "page" value = "{{$.Page}}" />
                     <br>Link Address:<input type="text" name="linkAddr"> 
