@@ -20,7 +20,7 @@ ENV PATH="${PATH}:/usr/local/go/bin"
 ENV PATH="/go/bin:${PATH}"
 
 #define healthchecks
-HEALTHCHECK --start-period=2m --interval=5m --timeout=1m \
+HEALTHCHECK --start-period=2m --start-interval=1m --interval=1m --timeout=1m \
    CMD curl -f --retry 6 --max-time 5 --retry-delay 2 --retry-max-time 30 "http://localhost:8080/healthcheck" || bash -c 'kill -s 15 -1 && (sleep 10; kill -s 9 -1)'
 
 RUN go get github.com/mattn/go-sqlite3

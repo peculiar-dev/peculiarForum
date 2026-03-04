@@ -7,7 +7,56 @@
         init(); 
     });
 */
-    init();
+    //init();
+
+    window.addEventListener('load', function() {
+        init(); 
+    });
+
+    //function to convert creation timestamp to a time-since human readable text
+    function timeSince(date) {
+        
+        var seconds = Math.floor(((new Date()/ 1000) - date) );
+        var interval = Math.floor(seconds / 31536000);
+
+        //console.log("interval:"+interval);
+      
+        if (interval == 1) {
+          return interval + " year ago";
+        }
+        if (interval > 1) {
+          return interval + " years ago";
+        }
+        interval = Math.floor(seconds / 2592000);
+        if (interval == 1) {
+          return interval + " month ago";
+        }
+        if (interval > 1) {
+          return interval + " months ago";
+        }
+        interval = Math.floor(seconds / 86400);
+        if (interval == 1) {
+          return interval + " day ago";
+        }
+        if (interval > 1) {
+          return interval + " days ago";
+        }
+        interval = Math.floor(seconds / 3600);
+        if (interval == 1) {
+          return interval + " hour ago";
+        }
+        if (interval > 1) {
+          return interval + " hours ago";
+        }
+        interval = Math.floor(seconds / 60);
+        if (interval == 1) {
+          return interval + " minute ago";
+        }
+        if (interval > 1) {
+          return interval + " minutes ago";
+        }
+        return Math.floor(seconds) + " seconds ago";
+    }   
 
     // Used for creating a new FileList in a round-about way
     function FileListItem(a) {
@@ -122,7 +171,6 @@
         console.log("adding click event to pic button");
     };
 
-
     function init(){
         console.log("initialize");
         console.log("root:",current_root);
@@ -158,6 +206,20 @@
         current_comment = ccomment;
     };
 
+        // JavaScript to handle post button actions
+    document.querySelectorAll('.post-button').forEach(button => {
+        console.log("initializing post button")
+        const postBox = document.getElementById("post-box");
+        postBox.style.display = 'none';
+        button.addEventListener('click', function() {
+            if (postBox.style.display === 'block') {
+                postBox.style.display = 'none';
+            } else {
+                postBox.style.display = 'block';
+            }
+        });
+    });
+
     // Handle sending (example)
     document.querySelectorAll('.send-button').forEach(button => {
         button.addEventListener('click', sendClick(ccomment)); 
@@ -171,20 +233,6 @@
         postBox.style.display = 'block';    
     }
     }
-
-    // JavaScript to handle post button actions
-    document.querySelectorAll('.post-button').forEach(button => {
-        console.log("initializing post button")
-        const postBox = document.getElementById("post-box");
-        postBox.style.display = 'none';
-        button.addEventListener('click', function() {
-            if (postBox.style.display === 'block') {
-                postBox.style.display = 'none';
-            } else {
-                postBox.style.display = 'block';
-            }
-        });
-    });
 
     //handle after submit for post 
     function afterSubmit(e,form) {

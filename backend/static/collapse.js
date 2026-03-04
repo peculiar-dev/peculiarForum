@@ -93,7 +93,8 @@
     function collapseClick(e){
         const targetId = e.currentTarget.getAttribute('data-target');
         const content = document.getElementById(targetId);
-        if (content.style.display === 'block') {
+        console.log("target display:"+content.style.display);
+        if (content.style.display === 'block' || content.style.display === '') {
             content.style.display = 'none';
             e.currentTarget.innerHTML = '+';
         } else {

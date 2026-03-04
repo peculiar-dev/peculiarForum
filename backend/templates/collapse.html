@@ -11,6 +11,7 @@
     <!--
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     -->
+    <link rel="stylesheet" href="/static/index.css">
     <link rel="stylesheet" href="/static/themes/{{.User.Theme}}/index.css">
     <title>Collapsible Comment View</title>
 </head>
@@ -64,7 +65,7 @@
                     <button class="reply-button" data-reply-target="{{ $replyBoxId }}">Reply</button>
                     {{if .Sublist}}
                         <!-- Show collapse/expand button only if there are sub-items -->
-                        <button class="collapse-button" data-target="{{ $collapseContentId }}">+</button>
+                        <button class="collapse-button" data-target="{{ $collapseContentId }}">-</button>
                         {{end}}
                     {{if.Editable}}
                         <!-- Edit button for all items -->
