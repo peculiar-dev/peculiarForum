@@ -19,6 +19,10 @@
         var seconds = Math.floor(((new Date()/ 1000) - date) );
         var interval = Math.floor(seconds / 31536000);
 
+        if (interval < 0){
+            return " Sticky";
+        }
+
         //console.log("interval:"+interval);
       
         if (interval == 1) {

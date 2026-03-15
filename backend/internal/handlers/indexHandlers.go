@@ -101,6 +101,7 @@ func (index *IndexHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 
 	var bRoot bool
 	var bSticky bool
+	var pic string
 	//var commentLink string
 
 	id := uuid.New().String()
@@ -121,7 +122,10 @@ func (index *IndexHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	pics := strings.Split(picture, "/")
-	pic := pics[len(pics)-2] + "/" + pics[len(pics)-1] // strip off user/pic
+
+	if len(pics) > 1 {
+		pic = pics[len(pics)-2] + "/" + pics[len(pics)-1] // strip off user/pic
+	}
 
 	log.Println("picture in Add:", pic)
 

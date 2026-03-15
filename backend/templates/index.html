@@ -152,7 +152,7 @@ function onLoadPage() {
                     {{end}}
                 </div>
                 <span id="{{$timestampId}}"></span>
-                <script>document.getElementById('{{$timestampId}}').textContent = timeSince({{.Created.Unix}});</script>
+                <script>document.getElementById('{{$timestampId}}').textContent = timeSince({{.Created.UTC.Unix}});</script>
             </div>
             <!-- Edit box that will show/hide when edit button is clicked -->
             <div id="{{ $editBoxId }}" class="edit-box">
