@@ -8,6 +8,11 @@
   --button-text-color: #000000;
 }
 
+.div {
+    display: flex;
+    flex-direction: column; /* Stacks the items vertically */
+    align-items: center; /* Centers items horizontally along the cross-axis */
+}
 
 body {
     width: fit-content;
@@ -110,7 +115,7 @@ header {
     color: var(--button-text-color);
     border: none;
     padding: 2px 5px;
-    font-size: 10px;
+    font-size: 14px;
     border-radius: 2px;
     margin-top: 5px; /* Add margin above button */
     text-align: center;
@@ -146,7 +151,7 @@ header {
     color: var(--button-text-color);
     border: none;
     padding: 2px 5px;
-    font-size: 10px;
+    font-size: 14px;
     border-radius: 2px;
     margin-top: 5px; /* Add margin above button */
 }
@@ -157,7 +162,7 @@ header {
     color: var(--button-text-color);
     border: none;
     padding: 2px 5px;
-    font-size: 10px;
+    font-size: 14px;
     border-radius: 2px;
     margin-top: 5px; /* Add margin above button */
 }
@@ -168,7 +173,7 @@ header {
     color: var(--button-text-color);
     border: none;
     padding: 2px 5px;
-    font-size: 10px;
+    font-size: 14px;
     border-radius: 2px;
     margin-top: 5px; /* Add margin above button */
 }
@@ -179,7 +184,7 @@ header {
     color: var(--button-text-color);
     border: none;
     padding: 2px 5px;
-    font-size: 10px;
+    font-size: 14px;
     border-radius: 2px;
     margin-top: 5px; /* Add margin above button */
 }
@@ -189,6 +194,20 @@ header {
     display: block;
     overflow: auto; 
     
+}
+
+.paste-box {
+    width: 100px; 
+    height: 100px; 
+    background-color: rgb(167, 167, 167); 
+    border: 2px solid black; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center; 
+    font-family: sans-serif; 
+    padding: 20px; 
+    box-sizing: border-box;
 }
 
 .reply-box {
@@ -209,7 +228,7 @@ header {
     color: var(--button-text-color);
     border: none;
     padding: 2px 5px;
-    font-size: 10px;
+    font-size: 14px;
     border-radius: 2px;
     margin-top: 5px; /* Add margin above button */
 }
@@ -220,7 +239,7 @@ header {
     color: var(--button-text-color);
     border: none;
     padding: 2px 5px;
-    font-size: 10px;
+    font-size: 14px;
     border-radius: 2px;
     margin-top: 5px; /* Add margin above button */
 }
@@ -259,6 +278,15 @@ header {
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
+    display: flex;
+    flex-direction: column; /* Stacks the items vertically */
+    align-items: center; /* Centers items horizontally along the cross-axis */
+}
+
+.post-img-target {
+    display: flex;
+    flex-direction: column; /* Stacks the items vertically */
+    align-items: center; /* Centers items horizontally along the cross-axis */
 }
 
 .post-box textarea {
@@ -295,6 +323,7 @@ header {
     border: none;
     padding: 5px 15px;
     font-size: 14px;
+    font-weight: bold;
     border-radius: 5px;
     margin-top: 10px; /* Add margin above button */
 }

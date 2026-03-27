@@ -5,8 +5,6 @@
     crossorigin="anonymous">
 </script>
 
-
-
 <script>
 
     document.addEventListener('htmx:afterSettle',function(evt){
@@ -33,42 +31,41 @@ function onLoadPage() {
 
     {{ template "header" . }}
 
-    <!--
-    <div id="external-content" 
-         hx-get="/static/header.html" 
-         hx-trigger="load" 
-         hx-target="#external-content" 
-         hx-swap="outerHTML">
-    </div>
-    -->
-
     <button class="post-button" >Post</button>
             <!-- Post box that will show/hide when post button is clicked -->
             <div id="post-box" class="post-box">
-                <div class="instructions">Enter your post below:</div>
-                {{block "sub-pic-element" .}} 
-                    <div id="post-img-target">
+                
+                <button class="pic-button" data-pic-target="subPic">Upload Image</button> 
+                or<br>
+                <div class = "paste-box" contenteditable="true" >
+                    PASTE IMAGE HERE
+                </div>
+                {{block "sub-pic-element" .}}
+                 <div id="post-img-target" contenteditable="true">         
                         {{if ne $.CurrentImage ""}}
+                            Image Preview:<br>
                             <span><img class="post-pic" id="post-pic" src="{{$.CurrentImage}}" > <br> </span>
                             <script>
                                 console.log("running script to update postBox and current Image")
 			                    current_image = "{{ $.CurrentImage }}"
                                 console.log("current image is:", current_image)
                                 postBoxTemp = document.getElementById("post-box");
-                                postBoxTemp.style.display = 'none';
+                                //postBoxTemp.style.display = 'none';
+                                postImgTargetTemp = document.getElementById("post-img-target");
+                                postImgTargetTemp.style.display = 'flex';
                                 picInputTemp = document.getElementById("picture");
                                 picInputTemp.value = current_image;
     		                </script>
                         {{end}}
-                        <button class="pic-button" data-pic-target="subPic">Upload Image for Submission</button>
                         <form style="display: none;" class="form-horizontal" id="subPic" hx-encoding="multipart/form-data" name = "filesForm" hx-swap="innerHTML" hx-target="#post-img-target" hx-post="/indexSubPicUpload" >    
                         <div class="input-group">
                         <input type="file" name="myfiles" id="myfiles" multiple="multiple" class="form-input input-lg" onchange="autoSubmitForm('subPic',event)"> 
                         <button type="submit" style="display: none;">Upload</button>
-                    </div>
-                    </form>
-                    </div>
+                        </div>
+                        </form>
+                    </div> 
                 {{end}}
+                <br>
                 <form hx-swap="innerHTML" hx-target="#comment-list" hx-post="/indexAddComment" hx-on::after-request="afterSubmit(event, this)"> 
                     <input type = "hidden" name = "picture" id="picture" value = "{{$.CurrentImage}}" />
                     <textarea name="comment" id="comment" placeholder="Write your comment here..." rows="4" cols="50"></textarea>
@@ -84,9 +81,6 @@ function onLoadPage() {
 {{block "comment-list-element" .}} 
 {{template "list" .}} 
 {{end}}
-<!--
-<script src="/static/index.js"></script>
--->
 
 </body>
 </html>

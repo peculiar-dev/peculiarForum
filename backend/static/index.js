@@ -1,189 +1,223 @@
-    var current_comment = "";
-    var current_image = "";
-    var current_root = window.location.pathname.split('/')[2];
+var current_comment = "";
+var current_image = "";
+var current_root = window.location.pathname.split('/')[2];
 
-   /*
-    document.addEventListener('htmx:afterSettle',function(evt){
-        init(); 
-    });
-*/
-    //init();
 
-    window.addEventListener('load', function() {
-        init(); 
-    });
+document.addEventListener('htmx:afterSettle', function (evt) {
+    init();
+});
 
-    //function to convert creation timestamp to a time-since human readable text
-    function timeSince(date) {
-        
-        var seconds = Math.floor(((new Date()/ 1000) - date) );
-        var interval = Math.floor(seconds / 31536000);
+//init();
 
-        if (interval < 0){
-            return " Sticky";
-        }
+window.addEventListener('load', function () {
+    init();
+});
 
-        //console.log("interval:"+interval);
-      
-        if (interval == 1) {
-          return interval + " year ago";
-        }
-        if (interval > 1) {
-          return interval + " years ago";
-        }
-        interval = Math.floor(seconds / 2592000);
-        if (interval == 1) {
-          return interval + " month ago";
-        }
-        if (interval > 1) {
-          return interval + " months ago";
-        }
-        interval = Math.floor(seconds / 86400);
-        if (interval == 1) {
-          return interval + " day ago";
-        }
-        if (interval > 1) {
-          return interval + " days ago";
-        }
-        interval = Math.floor(seconds / 3600);
-        if (interval == 1) {
-          return interval + " hour ago";
-        }
-        if (interval > 1) {
-          return interval + " hours ago";
-        }
-        interval = Math.floor(seconds / 60);
-        if (interval == 1) {
-          return interval + " minute ago";
-        }
-        if (interval > 1) {
-          return interval + " minutes ago";
-        }
-        return Math.floor(seconds) + " seconds ago";
-    }   
+//function to convert creation timestamp to a time-since human readable text
+function timeSince(date) {
 
-    // Used for creating a new FileList in a round-about way
-    function FileListItem(a) {
-        a = [].slice.call(Array.isArray(a) ? a : arguments)
-        for (var c, b = c = a.length, d = !0; b-- && d;) d = a[b] instanceof File
-        if (!d) throw new TypeError("expected argument to FileList is File or array of File objects")
-        for (b = (new ClipboardEvent("")).clipboardData || new DataTransfer; c--;) b.items.add(a[c])
-        return b.files
+    var seconds = Math.floor(((new Date() / 1000) - date));
+    var interval = Math.floor(seconds / 31536000);
+
+    if (interval < 0) {
+        return " Sticky";
     }
 
-    async function autoSubmitForm(formID,event) {
-        var form = document.getElementById(formID)
-        if (form) {
-            // Trigger the HTMX post
-            // after resizing the image. 
-            
-            const file = event.target.files[0];
-	        if (!file) {
-                console.log("no file found");
-                return;
-            }
-            console.log("filename:" + file.name);
+    //console.log("interval:"+interval);
 
-            /*resize here*/
-            const maxWidth = 800;
-            const maxHeight = 800;
-            const result = [];
-            
-            for (const file of event.target.files) {
-              const canvas = document.createElement('canvas');
-              const ctx = canvas.getContext('2d');
-              const img = await createImageBitmap(file);
-              
-              // calculate new size
-              const ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
-              const width = img.width * ratio + .5 | 0;
-              const height = img.height * ratio + .5 | 0;
-          
-              // resize the canvas to the new dimensions
-              canvas.width = width;
-              canvas.height = height;
-              canvas.hidden = true;
-          
-              // scale & draw the image onto the canvas
-              ctx.drawImage(img, 0, 0, width, height);
-          
-              // Get the binary (aka blob)
-              const blob = await new Promise(rs => canvas.toBlob(rs, 1));
-              const resizedFile = new File([blob], file.name, file);
-              result.push(resizedFile);
-            }
-            
-            const fileList = new FileListItem(result);
-                  
-                  // temporary remove event listener since
-                  // assigning a new filelist to the input
-                  // will trigger a new change event...
-                  listener = form.onchange
-                  form.onchange = null
-                  event.target.files = fileList
-                  form.onchange = listener
-        
-            /* end resize */
+    if (interval == 1) {
+        return interval + " year ago";
+    }
+    if (interval > 1) {
+        return interval + " years ago";
+    }
+    interval = Math.floor(seconds / 2592000);
+    if (interval == 1) {
+        return interval + " month ago";
+    }
+    if (interval > 1) {
+        return interval + " months ago";
+    }
+    interval = Math.floor(seconds / 86400);
+    if (interval == 1) {
+        return interval + " day ago";
+    }
+    if (interval > 1) {
+        return interval + " days ago";
+    }
+    interval = Math.floor(seconds / 3600);
+    if (interval == 1) {
+        return interval + " hour ago";
+    }
+    if (interval > 1) {
+        return interval + " hours ago";
+    }
+    interval = Math.floor(seconds / 60);
+    if (interval == 1) {
+        return interval + " minute ago";
+    }
+    if (interval > 1) {
+        return interval + " minutes ago";
+    }
+    return Math.floor(seconds) + " seconds ago";
+}
 
-            htmx.trigger(form, 'submit');
-            console.log("filename:" + file.name);
-            console.log("fired submit to autosubmit picture form.");
+// Used for creating a new FileList in a round-about way
+function FileListItem(a) {
+    a = [].slice.call(Array.isArray(a) ? a : arguments)
+    for (var c, b = c = a.length, d = !0; b-- && d;) d = a[b] instanceof File
+    if (!d) throw new TypeError("expected argument to FileList is File or array of File objects")
+    for (b = (new ClipboardEvent("")).clipboardData || new DataTransfer; c--;) b.items.add(a[c])
+    return b.files
+}
+
+document.addEventListener('paste', (event) => {
+    event.preventDefault();
+    const clipboardItem = event.clipboardData.files[0];
+    if (!clipboardItem) return;
+    const fileName = crypto.randomUUID() + event.clipboardData.files[0].name;
+    console.log("paste event from:", event.target.id);
+    event.target.files = FileListItem([new File([event.clipboardData.files[0]], fileName)]);
+    event.target.files[0].name = fileName;
+    autoSubmitForm("subPic", event);
+
+});
+
+async function autoSubmitForm(formID, event) {
+    var form = document.getElementById(formID)
+    if (form) {
+        // Trigger the HTMX post
+        // after resizing the image. 
+
+        const file = event.target.files[0];
+        if (!file) {
+            console.log("no file found");
+            return;
         }
-        
+        console.log("filename:" + file.name);
+
+        /*resize here*/
+        const maxWidth = 800;
+        const maxHeight = 800;
+        const result = [];
+
+        //  for (const file of event.target.files) { // this does not need to be a loop.
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = await createImageBitmap(file);
+
+        // calculate new size
+        const ratio = Math.min(maxWidth / img.width, maxHeight / img.height);
+        const width = img.width * ratio + .5 | 0;
+        const height = img.height * ratio + .5 | 0;
+
+        // resize the canvas to the new dimensions
+        canvas.width = width;
+        canvas.height = height;
+        canvas.hidden = true;
+
+        // scale & draw the image onto the canvas
+        ctx.drawImage(img, 0, 0, width, height);
+
+        // Get the binary (aka blob)
+        const blob = await new Promise(rs => canvas.toBlob(rs, 'image/png'));
+        console.log("filename inside loop:" + file.name); // this does output a filename, so we know it has a filename.
+        const resizedFile = new File([blob], file.name, file);
+
+        /* debug 
+        const container = document.getElementById("post-box");
+          const imgElement = document.createElement("img");
+          imgElement.src = URL.createObjectURL(resizedFile);
+          container.appendChild(imgElement);
+          */
+
+        //  result.push(resizedFile);
+        //  }
+
+        //  const fileList = new FileListItem(result);
+
+
+        //const fileR = fileList[0];
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(resizedFile);
+
+        // 2. Populate the input
+        const fileInput = form.querySelector('input[type="file"]');
+        fileInput.files = dataTransfer.files;
+        // temporary remove event listener since
+        // assigning a new filelist to the input
+        // will trigger a new change event...
+        //
+
+        //
+        //console.log("form:", form);
+        // listener = form.onchange
+        // form.onchange = null
+        //event.target.files = fileList
+        // form.onchange = listener
+
+        /* end resize */
+
+        htmx.trigger(form, 'submit');
+        console.log("filename:" + file.name);
+        console.log("fired submit to autosubmit picture form.");
     }
 
-    //collaps-button click function
-    function collapseClick(e){
-        const targetId = e.currentTarget.getAttribute('data-target');
-        const content = document.getElementById(targetId);
-        if (content.style.display === 'block') {
-            content.style.display = 'none';
-            e.currentTarget.innerHTML = '+';
-        } else {
-            content.style.display = 'block';
-            e.currentTarget.innerHTML = '-';
-        }
-    };
+}
 
-            //function to handle reply-button click
-    function replyClick(e){
-        const replyBoxId = e.currentTarget.getAttribute('data-reply-target');
-        const replyBox = document.getElementById(replyBoxId);
-        if (replyBox.style.display === 'block') {
-            replyBox.style.display = 'none';
-        } else {
-            replyBox.style.display = 'block';
-        }
-    };
+//collaps-button click function
+function collapseClick(e) {
+    const targetId = e.currentTarget.getAttribute('data-target');
+    const content = document.getElementById(targetId);
+    if (content.style.display === 'block') {
+        content.style.display = 'none';
+        e.currentTarget.innerHTML = '+';
+    } else {
+        content.style.display = 'block';
+        e.currentTarget.innerHTML = '-';
+    }
+};
 
-    // function to handle edit-button click
-    function editClick(e){
-        const editBoxId = e.currentTarget.getAttribute('data-edit-target');
-        const editBox = document.getElementById(editBoxId);
-        if (editBox.style.display === 'block') {
-            editBox.style.display = 'none';
-        } else {
-            editBox.style.display = 'block';
-        }
-    };
+//function to handle reply-button click
+function replyClick(e) {
+    const replyBoxId = e.currentTarget.getAttribute('data-reply-target');
+    const replyBox = document.getElementById(replyBoxId);
+    if (replyBox.style.display === 'block') {
+        replyBox.style.display = 'none';
+    } else {
+        replyBox.style.display = 'block';
+    }
+};
 
-    // function to handle pic-button click
-    function picClick(e){
-        const picBoxId = e.currentTarget.getAttribute('data-pic-target');
-        const picBox = document.getElementById(picBoxId);
-        picBox.myfiles.click();
-        console.log("adding click event to pic button");
-    };
+// function to handle edit-button click
+function editClick(e) {
+    const editBoxId = e.currentTarget.getAttribute('data-edit-target');
+    const editBox = document.getElementById(editBoxId);
+    if (editBox.style.display === 'block') {
+        editBox.style.display = 'none';
+    } else {
+        editBox.style.display = 'block';
+    }
+};
 
-    function init(){
-        console.log("initialize");
-        console.log("root:",current_root);
-        //document.getElementById("form_root").value = current_root;
-        var elements = document.getElementsByName("root");
-        for(var i = 0; i < elements.length; i++) {
-            console.log("found");
-            elements[i].value = current_root;
-        }
+// function to handle pic-button click
+function picClick(e) {
+    const picBoxId = e.currentTarget.getAttribute('data-pic-target');
+    const picBox = document.getElementById(picBoxId);
+    picBox.myfiles.click();
+    console.log("adding click event to pic button");
+};
+
+function init() {
+    console.log("initialize");
+    console.log("root:", current_root);
+    //document.getElementById("form_root").value = current_root;
+    var elements = document.getElementsByName("root");
+    for (var i = 0; i < elements.length; i++) {
+        console.log("found");
+        elements[i].value = current_root;
+    }
 
     // JavaScript to handle collapsible actions
     document.querySelectorAll('.collapse-button').forEach(button => {
@@ -202,31 +236,31 @@
 
     // JavaScript to handle pic button actions
     document.querySelectorAll('.pic-button').forEach(button => {
-        button.addEventListener('click', picClick) 
+        button.addEventListener('click', picClick)
     });
 
     // Function to handle send-button click
-    function sendClick(ccomment){
+    function sendClick(ccomment) {
         current_comment = ccomment;
     };
 
-        // JavaScript to handle post button actions
+    // JavaScript to handle post button actions
     document.querySelectorAll('.post-button').forEach(button => {
         console.log("initializing post button")
         const postBox = document.getElementById("post-box");
         postBox.style.display = 'none';
-        button.addEventListener('click', function() {
-            if (postBox.style.display === 'block') {
+        button.addEventListener('click', function () {
+            if (postBox.style.display === 'flex') {
                 postBox.style.display = 'none';
             } else {
-                postBox.style.display = 'block';
+                postBox.style.display = 'flex';
             }
         });
     });
 
     // Handle sending (example)
     document.querySelectorAll('.send-button').forEach(button => {
-        button.addEventListener('click', sendClick(ccomment)); 
+        button.addEventListener('click', sendClick(ccomment));
     });
 
     // make post box hidden on each HTMX refresh
@@ -234,19 +268,19 @@
     if (current_image === "") {
         postBox.style.display = 'none';
     } else {
-        postBox.style.display = 'block';    
+        postBox.style.display = 'flex';
     }
-    }
+}
 
-    //handle after submit for post 
-    function afterSubmit(e,form) {
-        if(e.detail.successful) form.reset();
-        console.log("after submit triggered");
-        current_image = "";
-        const postPic = document.getElementById("post-pic");
-        if (postPic) {
-            postPic.src = "";
-        }
-        picInputTemp = document.getElementById("picture");
-        picInputTemp.value = current_image;
-    };
+//handle after submit for post 
+function afterSubmit(e, form) {
+    if (e.detail.successful) form.reset();
+    console.log("after submit triggered");
+    current_image = "";
+    const postPic = document.getElementById("post-pic");
+    if (postPic) {
+        postPic.src = "";
+    }
+    picInputTemp = document.getElementById("picture");
+    picInputTemp.value = current_image;
+};

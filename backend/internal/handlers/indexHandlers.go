@@ -355,7 +355,7 @@ func (index *IndexHandler) UploadHandler(w http.ResponseWriter, r *http.Request)
 
 func (index *IndexHandler) NewPostUploadHandler(w http.ResponseWriter, r *http.Request) {
 
-	id := ""
+	//id := ""
 	//root := ""
 	filename := ""
 	//page := 0
@@ -367,6 +367,14 @@ func (index *IndexHandler) NewPostUploadHandler(w http.ResponseWriter, r *http.R
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	/* debug
+	bodyBytes, err := io.ReadAll(r.Body) // Read the raw body
+	if err != nil {
+		http.Error(w, "can't read body", http.StatusInternalServerError)
+		return
+	}
+	log.Println("Post Data:", string(bodyBytes))
+	*/
 
 	// Grab the request's MultipartReader
 	reader, err := r.MultipartReader()
@@ -387,15 +395,21 @@ func (index *IndexHandler) NewPostUploadHandler(w http.ResponseWriter, r *http.R
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-
-		if part.FileName() != "" {
+		log.Println("Processing part, form name:", part.FormName(), " file name:", part.FileName(), " content type:", part.Header.Get("Content-Type"))
+		if part.FileName() != "" || part.Header.Get("Content-Type") == "image/png" {
 			// Create the destination file
-			dst, err := os.Create("./downloads/" + part.FileName())
+			filename = part.FileName()
+			if filename == "" {
+				log.Println("No filename provided, generating random filename.")
+				filename = uuid.New().String() + ".png"
+			}
+			log.Println("Uploading file with filename:", filename)
+			dst, err := os.Create("./downloads/" + filename)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
-			filename = part.FileName()
+
 			defer dst.Close()
 
 			// Copy the part to dst
@@ -412,7 +426,7 @@ func (index *IndexHandler) NewPostUploadHandler(w http.ResponseWriter, r *http.R
 					return
 				}
 				log.Println("id field value:", string(data))
-				id = string(data)
+				//id = string(data)
 			}
 			/*
 				if part.FormName() == "root" {
@@ -472,7 +486,7 @@ func (index *IndexHandler) NewPostUploadHandler(w http.ResponseWriter, r *http.R
 	}
 
 	log.Println("uploading file from:", username, " and setting as current file")
-	index.comments.EditCommentPic(id, username+"/"+filename)
+	//index.comments.EditCommentPic(id, username+"/"+filename)
 
 	//currentUser := index.users.GetUser(username)
 	//currentComments := index.comments.GetRootComments(username)
