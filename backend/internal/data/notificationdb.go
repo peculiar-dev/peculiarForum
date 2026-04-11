@@ -17,4 +17,5 @@ type Notificationdb interface {
 	LoadTestNotifications()
 	GetNotifications(username string) *[]Notification
 	HasNotifications(username string, since time.Time) bool
+	ClearNotifications(username string) error
 }

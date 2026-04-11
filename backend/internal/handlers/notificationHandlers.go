@@ -21,6 +21,19 @@ func NewNotificationHandler(notificationdb data.Notificationdb, userdb data.User
 	return &NotificationHandler{notifications: notificationdb, users: userdb}
 }
 
+func (notification *NotificationHandler) ClearNotifications(w http.ResponseWriter, r *http.Request) {
+	username := r.Header.Get("X-User")
+	if username == "" {
+		username = "test2"
+	}
+	err := notification.notifications.ClearNotifications(username)
+	if err != nil {
+		http.Error(w, "Error clearing notifications. Contact sysadmin.", http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/notifications", http.StatusSeeOther)
+}
+
 func (notification *NotificationHandler) IndexHandler(w http.ResponseWriter, r *http.Request) {
 
 	username := r.Header.Get("X-User")

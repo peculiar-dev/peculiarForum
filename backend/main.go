@@ -317,6 +317,7 @@ func main() {
 	// notifications
 
 	http.HandleFunc("/notifications", notificationHandler.IndexHandler)
+	http.HandleFunc("/clearNotifications", notificationHandler.ClearNotifications)
 
 	// user
 

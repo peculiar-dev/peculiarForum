@@ -22,6 +22,26 @@ type CommentHandler struct {
 type CommentsData struct {
 	Comments *[]data.Comment
 	User     *data.User
+	Users    *[]data.User
+}
+
+type CommentList struct {
+	Comments interface{}
+	Users    interface{}
+	User     interface{}
+}
+
+func MakeCommentList(sublist interface{}, users interface{}, user interface{}) CommentList {
+	return CommentList{Comments: sublist, Users: users, User: user}
+}
+
+func parseCollapseTemplate(users *[]data.User, user *data.User) (*template.Template, error) {
+	funcMap := template.FuncMap{
+		"withUsers": func(sublist interface{}) CommentList {
+			return MakeCommentList(sublist, users, user)
+		},
+	}
+	return template.New("collapse.html").Funcs(funcMap).ParseFiles("templates/collapse.html")
 }
 
 func NewCommentHandler(commentdb data.Commentdb, notificationdb data.Notificationdb, userdb data.Userdb) *CommentHandler {
@@ -39,17 +59,22 @@ func (ch *CommentHandler) IDHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("In getCommentHandler looking for Parent:", parent)
 
-	//currentComments := getChildComments(database, parent)
-
-	//test child comment logic.
-	//currentComments := ch.comments.GetChildComments(parent, username)
+	users := ch.users.GetUsers()
 
 	var data CommentsData
 	data.Comments = ch.comments.GetChildComments(parent, username)
 	data.User = ch.users.GetUser(username)
+	data.Users = users
 
-	tmpl := template.Must(template.ParseFiles("templates/collapse.html"))
-	tmpl.Execute(w, data)
+	tmpl, err := parseCollapseTemplate(users, data.User)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 
 }
 
@@ -103,10 +128,16 @@ func (ch *CommentHandler) AddHandler(w http.ResponseWriter, r *http.Request) {
 
 	var data CommentsData
 	data.Comments = currentComments
+	data.User = ch.users.GetUser(username)
+	data.Users = ch.users.GetUsers()
 
-	//PrintComments(currentComments, "")
+	users := data.Users
 
-	tpl := template.Must(template.ParseFiles("templates/collapse.html"))
+	tpl, err := parseCollapseTemplate(users, data.User)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	tpl.ExecuteTemplate(w, "comment-list-element", data)
 }
@@ -121,12 +152,19 @@ func (ch *CommentHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 	parent := r.FormValue("parent")
 	id := r.FormValue("id")
 	linkAddr := r.FormValue("linkAddr")
+	notifyUser := r.FormValue("notifyUser")
 
 	if username == "" {
 		username = "test"
 	}
 	//root := r.FormValue("root") // make boolean?
 	//sticky := r.FormValue("sticky") // make boolean?
+
+	if notifyUser != "_none" && notifyUser != "" {
+		link := "/comment/" + r.FormValue("root") + "/" + id + "#" + id
+		ch.notifications.InsertNotification(data.Notification{Sender: username, Reciever: notifyUser, CommentLink: link, Created: time.Now()})
+		message += " \n(notification sent to " + notifyUser + ")"
+	}
 
 	parent = parent[10:] // strip javascript identifier
 	//comment := Comment{Id: id, User: username, Message: message, Root: bRoot, Sticky: bSticky, Sublist: nil}
@@ -145,10 +183,16 @@ func (ch *CommentHandler) EditHandler(w http.ResponseWriter, r *http.Request) {
 
 	var data CommentsData
 	data.Comments = currentComments
+	data.User = ch.users.GetUser(username)
+	data.Users = ch.users.GetUsers()
 
-	// PrintComments(currentComments, "")
+	users := data.Users
 
-	tpl := template.Must(template.ParseFiles("templates/collapse.html"))
+	tpl, err := parseCollapseTemplate(users, data.User)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	tpl.ExecuteTemplate(w, "comment-list-element", data)
 }
@@ -275,8 +319,17 @@ func (ch *CommentHandler) UploadHandler(w http.ResponseWriter, r *http.Request) 
 
 	var data CommentsData
 	data.Comments = currentComments
+	data.User = ch.users.GetUser(username)
+	data.Users = ch.users.GetUsers()
 
-	tpl := template.Must(template.ParseFiles("templates/collapse.html"))
+	users := data.Users
+
+	tpl, err := parseCollapseTemplate(users, data.User)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	tpl.ExecuteTemplate(w, "comment-list-element", data)
 
 }

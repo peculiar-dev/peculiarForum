@@ -153,3 +153,20 @@ func (db *SqliteNotificationDB) GetNotifications(username string) *[]Notificatio
 
 	return &notifications
 }
+
+func (db *SqliteNotificationDB) ClearNotifications(username string) error {
+
+	deleteSQL := `DELETE FROM notification WHERE reciever = ?`
+	statement, err := db.database.Prepare(deleteSQL) // Prepare statement.
+	// This is good to avoid SQL injections
+	if err != nil {
+		log.Fatalln(err.Error())
+		return err
+	}
+	_, err = statement.Exec(username)
+	if err != nil {
+		log.Fatalln(err.Error())
+		return err
+	}
+	return nil
+}

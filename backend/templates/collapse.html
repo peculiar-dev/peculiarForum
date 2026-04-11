@@ -12,7 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     -->
     <link rel="stylesheet" href="/static/index.css">
-    <link rel="stylesheet" href="/static/themes/{{.User.Theme}}/index.css">
+    <link rel="stylesheet" href="/static/themes/{{$.User.Theme}}/index.css">
     <title>Collapsible Comment View</title>
 </head>
 <body>
@@ -21,7 +21,7 @@
 
 <!-- Recursive template rendering for lists with sub-lists -->
 {{block "comment-list-element" .}} 
-{{template "list" .Comments}} 
+{{template "list" .}} 
 {{end}}
 <script src="/static/collapse.js"></script>
 </body>
@@ -30,7 +30,7 @@
 <!-- Recursive List Template Definition -->
 {{define "list"}} 
     <ul id="comment-list" style="list-style-type:none; padding-left: 0;">
-    {{range .}} 
+    {{range .Comments}} 
         <li>
             
             <!--{{ $itemId := (printf "item-%d" .Id) }} --><!-- Unique ID for each item -->
@@ -92,7 +92,7 @@
             <!-- If sub-items exist, display collapsible content -->
             {{if .Sublist}}
             <div id="{{ $collapseContentId }}" class="collapsible-content">
-                {{template "list" .Sublist}}
+                {{template "list" (withUsers .Sublist)}}
             </div>
             {{end}}
 
@@ -106,7 +106,17 @@
                     <input type = "hidden" name = "source" value = "comment" />
                        <!-- <input type="textarea" name="comment" id="comment" placeholder="Write your reply here..."> -->
                     <textarea name="comment" id="comment" rows="4" cols="50">{{.Message}}</textarea>
-                    <br>Link Address:<input type="text" name="linkAddr" value="{{.Link}}"> 
+                    <br>Link Address:<input type="text" name="linkAddr" value="{{.Link}}"><br> 
+                    
+                    <label for="notifyUser">Choose a User to notify:</label>
+                    <select id="notifyUser" name="notifyUser" default="_none">
+                    <option value="_none" selected>None</option>
+                    {{range $.Users}}
+                        {{if ne .Username $.User.Username}} <!-- Exclude the current user from the options -->
+                            <option value="{{.Username}}">{{.Username}}</option>
+                        {{end}}
+                    {{end}}
+                    </select>
                     <br><input class="edit-submit-button" value="Submit" type="submit" onclick='current_comment = "{{ $replyBoxId }}";'> 
                 </form>
             </div>

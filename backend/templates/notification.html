@@ -11,6 +11,9 @@
 
 </head>
 <body>
+    <form action="/clearNotifications" method="POST">
+        <button class="post-button" type="submit">Clear Notifications</button>
+    </form>
     <ul id="notification-list" style="list-style-type:none; padding-left: 0;">
     {{range .Notifications}} 
     <li> <a class="notification-button" href={{.CommentLink}} >{{.Sender }} replied ...</a> </li>    
