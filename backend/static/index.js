@@ -72,6 +72,10 @@ function FileListItem(a) {
 }
 
 document.addEventListener('paste', (event) => {
+    const pasteBox = document.getElementById("paste-box");
+    if (event.target.id !== "paste-box") {
+        return;
+    }
     event.preventDefault();
     const clipboardItem = event.clipboardData.files[0];
     if (!clipboardItem) return;
