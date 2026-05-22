@@ -1,11 +1,28 @@
 {{ define "header" }}
+<script 
+    src="https://unpkg.com/htmx.org@2.0.2" 
+    integrity="sha384-Y7hw+L/jvKeWIRRkqWYfPcvVxHzVzn5REgzbawhxAuQGwX1XWe70vji+VSeHOThJ" 
+    crossorigin="anonymous">
+</script>
 <header><div id="banner" class="title-bar">Peculiar Forum</div></header>
 <div class="button-row">
 
     <a id="home-button" class="header-button" href="/" >Home</a>
     <a id="mail-button" class="header-button" href="/mailIndex" >Mail</a>
     <a id="notification-button" class="header-button" href="/notifications" >Notifications</a>
-    <a id="chat-button" class="header-button" href="/chat">Chat</a>
+    
+
+    <div class="chat-button-container">
+        <a id="chat-button" class="header-button" href="/chat">Chat</a>
+        <!-- Unread count badge, updated every second via HTMX -->
+        <span class="chat-unread"
+                id="chat-unread-count" 
+                hx-swap="innerHTML" 
+                hx-get="/chatUnreadCount" 
+                hx-trigger="every 3s" >0</span> 
+ 
+    </div>
+    
     <a id="user-button" class="header-button" href="/settings">User</a>
 
 </div>

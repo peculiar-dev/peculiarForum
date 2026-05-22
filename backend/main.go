@@ -331,6 +331,7 @@ func main() {
 	//chat
 	http.HandleFunc("/chat", chatHandler.ChatIndexHandler)
 	http.HandleFunc("/chatSocket", chatHandler.ChatSocket)
+	http.HandleFunc("/chatUnreadCount", chatHandler.ChatUnreadCountHandler)
 
 	log.Println("Starting server on port: " + port)
 

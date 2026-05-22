@@ -125,6 +125,25 @@
             picBox.myfiles.click();
     };
 
+    // function to handle img-click
+    function imgClick(e) {
+        console.log("image clicked");
+        const img = e.currentTarget;
+        if (img.width != img.naturalWidth || img.height != img.naturalHeight) {
+            console.log("resizing image to natural dimensions");
+            img.style.width = img.naturalWidth + "px";
+            img.style.height = img.naturalHeight + "px";
+        } else {
+            console.log("resizing image to default dimensions");
+            const rootStyles = getComputedStyle(document.documentElement);
+            const imgDefaultWidth = rootStyles.getPropertyValue('--img-default-width').trim();
+            console.log("imgDefaultWidth:", imgDefaultWidth);
+            img.style.width = imgDefaultWidth;
+            img.style.height = "auto";
+        }
+    }
+
+
     function init(){
         console.log("initialize");
         console.log("root:",current_root);
@@ -161,6 +180,12 @@
         button.addEventListener('click', picClick);
     });
 
+    // JavaScript to handle img click actions
+    console.log("adding click event to images");
+    document.querySelectorAll('.post-pic').forEach(img => {
+        img.addEventListener('click', imgClick)
+    });
+
     // Handle sending (example)
     document.querySelectorAll('.send-button').forEach(button => {
         button.addEventListener('click', function(ccomment) {
@@ -173,7 +198,7 @@
     }
 
     document.addEventListener('htmx:afterSettle',function(evt){
-
+        if(evt.detail?.elt?.id === 'chat-unread-count') return;
         init();  
   
     });

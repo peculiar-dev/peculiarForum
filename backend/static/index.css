@@ -6,6 +6,7 @@
   --background-color: #ffffff;
   --text-color: #000000;
   --button-text-color: #000000;
+  --img-default-width: 370px;
 }
 
 .div {
@@ -387,6 +388,22 @@ pre {
 }
 
 .post-pic{
-    width:370px;
+    width: var(--img-default-width);
     height: auto;
+}
+
+.chat-button-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 50px;
+    gap: 0px;
+}
+
+.chat-unread {
+    font-size: 12px;
+    font-weight: bold;
+    color:var(--text-color);
+    line-height: 1;
+    text-align: center;
 }

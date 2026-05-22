@@ -23,7 +23,12 @@ document.addEventListener('keydown', function(event) {
 
 function sendMessage() {
     
-    websocket.send("<a href='/user/"+username+"'> <img class='user-icon' src='/downloads/"+username+"/_user_icon.png' alt='/user/"+username+"' ></a>" +username + ": " + textField.value);
+    if (!textField.value.startsWith("/")) {
+        websocket.send("<a href='/user/"+username+"'> <img class='user-icon' src='/downloads/"+username+"/_user_icon.png' alt='/user/"+username+"' ></a>" +username + ": " + textField.value);
+    } else {
+        websocket.send(textField.value);
+    }
+    
     window.location = '#chatContainer';
     textField.value = "";
     textField.focus();

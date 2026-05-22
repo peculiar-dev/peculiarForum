@@ -4,14 +4,20 @@ var current_root = window.location.pathname.split('/')[2];
 
 
 document.addEventListener('htmx:afterSettle', function (evt) {
+    //console.log(evt.detail?.elt?.id);
+    if(evt.detail?.elt?.id === 'chat-unread-count') return;
     init();
 });
 
+
 //init();
+
 
 window.addEventListener('load', function () {
     init();
 });
+
+
 
 //function to convert creation timestamp to a time-since human readable text
 function timeSince(date) {
@@ -205,6 +211,24 @@ function editClick(e) {
     }
 };
 
+// function to handle img-click
+function imgClick(e) {
+    console.log("image clicked");
+    const img = e.currentTarget;
+    if (img.width != img.naturalWidth || img.height != img.naturalHeight) {
+        console.log("resizing image to natural dimensions");
+        img.style.width = img.naturalWidth+"px";
+        img.style.height = img.naturalHeight+"px";
+    } else {
+        console.log("resizing image to default dimensions"); 
+        const rootStyles = getComputedStyle(document.documentElement);
+        const imgDefaultWidth = rootStyles.getPropertyValue('--img-default-width').trim(); 
+        console.log("imgDefaultWidth:", imgDefaultWidth);
+        img.style.width = imgDefaultWidth;
+        img.style.height = "auto";
+    }
+}
+
 // function to handle pic-button click
 function picClick(e) {
     const picBoxId = e.currentTarget.getAttribute('data-pic-target');
@@ -241,6 +265,12 @@ function init() {
     // JavaScript to handle pic button actions
     document.querySelectorAll('.pic-button').forEach(button => {
         button.addEventListener('click', picClick)
+    });
+
+    // JavaScript to handle img click actions
+    console.log("adding click event to images");
+    document.querySelectorAll('.post-pic').forEach(img => {
+        img.addEventListener('click', imgClick)
     });
 
     // Function to handle send-button click

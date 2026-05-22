@@ -5,6 +5,9 @@
     crossorigin="anonymous">
 </script>
 
+<script src="/static/collapse.js"></script>
+
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -23,7 +26,6 @@
 {{block "comment-list-element" .}} 
 {{template "list" .}} 
 {{end}}
-<script src="/static/collapse.js"></script>
 </body>
 </html>
 
@@ -43,7 +45,7 @@
             {{ $editBoxId := (printf "edit-box-%s" .Id) }} <!-- Unique ID for each reply box -->
             {{ $picBoxId := (printf "pic-box-%s" .Id) }} <!-- Unique ID for each reply box -->
             {{ $collapseContentId := (printf "collapse-content-%s" .Id) }} <!-- Unique ID for each collapsible content -->
-        
+            {{ $timestampId := (printf "timestamp-%s" .Id) }} <!-- Unique ID for each timestamp -->
 
             <div class="item-box">
                 <a name="{{.Id}}"></a>
@@ -87,6 +89,8 @@
                         </div>                   
                     {{end}}
                 </div>
+                <span id="{{$timestampId}}"></span>
+                <script>document.getElementById('{{$timestampId}}').textContent = timeSince({{.Created.UTC.Unix}});</script>
             </div>
 
             <!-- If sub-items exist, display collapsible content -->
